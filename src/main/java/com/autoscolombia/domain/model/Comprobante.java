@@ -42,8 +42,16 @@ public class Comprobante {
 
     @NotNull(message = "La fecha de generación es obligatoria")
     @Column(name = "fecha_generacion", nullable = false, updatable = false)
+    @Builder.Default
     private LocalDateTime fechaGeneracion = LocalDateTime.now();
 
     @Column(name = "qr_base64", columnDefinition = "TEXT")
     private String qrBase64;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.fechaGeneracion == null) {
+            this.fechaGeneracion = LocalDateTime.now();
+        }
+    }
 }

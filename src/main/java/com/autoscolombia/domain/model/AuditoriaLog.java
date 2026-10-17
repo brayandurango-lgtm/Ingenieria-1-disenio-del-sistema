@@ -51,8 +51,16 @@ public class AuditoriaLog {
 
     @NotNull(message = "La fecha y hora es obligatoria")
     @Column(name = "fecha_hora", nullable = false, updatable = false)
+    @Builder.Default
     private LocalDateTime fechaHora = LocalDateTime.now();
 
     @Column(name = "detalle", columnDefinition = "TEXT")
     private String detalle;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.fechaHora == null) {
+            this.fechaHora = LocalDateTime.now();
+        }
+    }
 }

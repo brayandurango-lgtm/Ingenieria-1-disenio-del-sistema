@@ -1,9 +1,17 @@
 package com.autoscolombia.integration;
 
+import com.autoscolombia.domain.enums.EstadoCelda;
 import com.autoscolombia.domain.enums.TipoUsuario;
 import com.autoscolombia.domain.enums.TipoVehiculo;
+import com.autoscolombia.domain.model.Celda;
 import com.autoscolombia.domain.model.Usuario;
+import com.autoscolombia.infrastructure.repository.AuditoriaLogRepository;
+import com.autoscolombia.infrastructure.repository.CeldaRepository;
+import com.autoscolombia.infrastructure.repository.ComprobanteRepository;
+import com.autoscolombia.infrastructure.repository.NovedadRepository;
+import com.autoscolombia.infrastructure.repository.RegistroRepository;
 import com.autoscolombia.infrastructure.repository.UsuarioRepository;
+import com.autoscolombia.infrastructure.repository.VehiculoRepository;
 import com.autoscolombia.presentation.dto.LoginRequest;
 import com.autoscolombia.presentation.dto.RegistroEntradaDTO;
 import com.autoscolombia.presentation.dto.RegistroSalidaDTO;
@@ -24,7 +32,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@org.junit.jupiter.api.Disabled("Disabled temporarily - context loading issues")
 class RegistroControllerIntegrationTest {
 
     @Autowired
@@ -32,6 +39,24 @@ class RegistroControllerIntegrationTest {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private CeldaRepository celdaRepository;
+
+    @Autowired
+    private RegistroRepository registroRepository;
+
+    @Autowired
+    private ComprobanteRepository comprobanteRepository;
+
+    @Autowired
+    private AuditoriaLogRepository auditoriaLogRepository;
+
+    @Autowired
+    private NovedadRepository novedadRepository;
+
+    @Autowired
+    private VehiculoRepository vehiculoRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -44,7 +69,21 @@ class RegistroControllerIntegrationTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        comprobanteRepository.deleteAll();
+        novedadRepository.deleteAll();
+        registroRepository.deleteAll();
+        auditoriaLogRepository.deleteAll();
+        celdaRepository.deleteAll();
+        vehiculoRepository.deleteAll();
         usuarioRepository.deleteAll();
+
+        Celda celda = Celda.builder()
+                .numero("A-01")
+                .piso(1)
+                .tipoVehiculo(TipoVehiculo.CARRO)
+                .estado(EstadoCelda.DISPONIBLE)
+                .build();
+        celdaRepository.save(celda);
 
         usuario = Usuario.builder()
                 .nombre("Test")

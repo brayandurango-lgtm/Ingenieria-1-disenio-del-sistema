@@ -58,13 +58,29 @@ public class Usuario {
     @NotNull(message = "El tipo de usuario es obligatorio")
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", nullable = false)
+    @Builder.Default
     private TipoUsuario tipo = TipoUsuario.OPERADOR;
 
     @NotNull(message = "El estado activo es obligatorio")
     @Column(name = "activo", nullable = false)
+    @Builder.Default
     private Boolean activo = true;
 
     @NotNull(message = "La fecha de registro es obligatoria")
     @Column(name = "fecha_registro", nullable = false, updatable = false)
+    @Builder.Default
     private LocalDateTime fechaRegistro = LocalDateTime.now();
+
+    @PrePersist
+    public void prePersist() {
+        if (this.fechaRegistro == null) {
+            this.fechaRegistro = LocalDateTime.now();
+        }
+        if (this.activo == null) {
+            this.activo = true;
+        }
+        if (this.tipo == null) {
+            this.tipo = TipoUsuario.OPERADOR;
+        }
+    }
 }

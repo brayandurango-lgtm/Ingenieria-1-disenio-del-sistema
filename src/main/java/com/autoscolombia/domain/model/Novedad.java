@@ -41,6 +41,7 @@ public class Novedad {
 
     @NotNull(message = "La fecha y hora es obligatoria")
     @Column(name = "fecha_hora", nullable = false, updatable = false)
+    @Builder.Default
     private LocalDateTime fechaHora = LocalDateTime.now();
 
     @NotNull(message = "El usuario que reporta es obligatorio")
@@ -51,4 +52,11 @@ public class Novedad {
     @Size(max = 255, message = "La URL de evidencia no puede exceder 255 caracteres")
     @Column(name = "evidencia_url", length = 255)
     private String evidenciaUrl;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.fechaHora == null) {
+            this.fechaHora = LocalDateTime.now();
+        }
+    }
 }

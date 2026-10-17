@@ -36,14 +36,26 @@ public class Celda {
     @NotNull(message = "El tipo de vehículo es obligatorio")
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_vehiculo", nullable = false)
+    @Builder.Default
     private TipoVehiculo tipoVehiculo = TipoVehiculo.CARRO;
 
     @NotNull(message = "El estado es obligatorio")
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false)
+    @Builder.Default
     private EstadoCelda estado = EstadoCelda.DISPONIBLE;
 
     @Size(max = 255, message = "Las observaciones no pueden exceder 255 caracteres")
     @Column(name = "observaciones", length = 255)
     private String observaciones;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.tipoVehiculo == null) {
+            this.tipoVehiculo = TipoVehiculo.CARRO;
+        }
+        if (this.estado == null) {
+            this.estado = EstadoCelda.DISPONIBLE;
+        }
+    }
 }

@@ -44,6 +44,7 @@ public class Registro {
 
     @NotNull(message = "La fecha y hora de entrada es obligatoria")
     @Column(name = "fecha_hora_entrada", nullable = false, updatable = false)
+    @Builder.Default
     private LocalDateTime fechaHoraEntrada = LocalDateTime.now();
 
     @Column(name = "fecha_hora_salida")
@@ -52,8 +53,19 @@ public class Registro {
     @NotNull(message = "El estado es obligatorio")
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false)
+    @Builder.Default
     private EstadoRegistro estado = EstadoRegistro.ACTIVO;
 
     @Column(name = "observaciones", columnDefinition = "TEXT")
     private String observaciones;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.fechaHoraEntrada == null) {
+            this.fechaHoraEntrada = LocalDateTime.now();
+        }
+        if (this.estado == null) {
+            this.estado = EstadoRegistro.ACTIVO;
+        }
+    }
 }

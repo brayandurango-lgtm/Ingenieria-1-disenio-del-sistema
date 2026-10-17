@@ -21,7 +21,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@org.junit.jupiter.api.Disabled("Disabled temporarily - context loading issues")
 class AuthControllerIntegrationTest {
 
     @Autowired
@@ -29,6 +28,9 @@ class AuthControllerIntegrationTest {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private com.autoscolombia.infrastructure.repository.AuditoriaLogRepository auditoriaLogRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -40,6 +42,7 @@ class AuthControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
+        auditoriaLogRepository.deleteAll();
         usuarioRepository.deleteAll();
 
         usuario = Usuario.builder()

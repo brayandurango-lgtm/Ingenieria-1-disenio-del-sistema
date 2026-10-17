@@ -50,6 +50,7 @@ public class Vehiculo {
     @NotNull(message = "El tipo de vehículo es obligatorio")
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", nullable = false)
+    @Builder.Default
     private TipoVehiculo tipo = TipoVehiculo.CARRO;
 
     @Size(max = 20, message = "El documento del propietario no puede exceder 20 caracteres")
@@ -66,5 +67,16 @@ public class Vehiculo {
 
     @NotNull(message = "La fecha de registro es obligatoria")
     @Column(name = "fecha_registro", nullable = false, updatable = false)
+    @Builder.Default
     private LocalDateTime fechaRegistro = LocalDateTime.now();
+
+    @PrePersist
+    public void prePersist() {
+        if (this.fechaRegistro == null) {
+            this.fechaRegistro = LocalDateTime.now();
+        }
+        if (this.tipo == null) {
+            this.tipo = TipoVehiculo.CARRO;
+        }
+    }
 }
