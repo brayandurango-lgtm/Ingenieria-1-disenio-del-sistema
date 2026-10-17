@@ -1,4 +1,4 @@
-# Modelo Entidad-Relación (MER / DER) y Diccionario de Datos
+# Modelo Entidad-Relación (MER), Modelo Relacional (MR) y Modelo Físico (MF)
 ## Sistema de Información "Autos Colombia" – Iteración 1
 **Actividad:** S20 - Evidencia de Aprendizaje 1. Diseño Sistema de Información – Iteración 1  
 **Institución:** Institución Universitaria Digital de Antioquia (IU Digital)  
@@ -11,44 +11,52 @@
 
 ---
 
-## 1. Modelo Conceptual de Datos
+## 1. Modelo Entidad-Relación Conceptual (MER)
 
-El modelo conceptual captura las entidades del dominio de parqueadero para la Iteración 1, sus relaciones y reglas de cardinalidad:
+El modelo conceptual describe las entidades del negocio, sus atributos esenciales y las relaciones que rigen el dominio del parqueadero en la Iteración 1:
 
-1. **USUARIO (1) ── (0..N) REGISTRO:**
-   * Un usuario (operador o administrador) puede registrar la entrada de cero o muchos vehículos a lo largo de su turno (`usuario_entrada_id`).
-   * Un usuario puede registrar la salida de cero o muchos vehículos (`usuario_salida_id`).
-2. **VEHICULO (1) ── (0..N) REGISTRO:**
-   * Un vehículo identificado por su placa única en Colombia puede tener múltiples registros históricos de permanencia en el parqueadero, pero **solo un registro con estado `ACTIVO` a la vez**.
-3. **CELDA (1) ── (0..N) REGISTRO:**
-   * Una celda física de parqueo (por ejemplo `A-01`) puede ser ocupada sucesivamente por diferentes registros a lo largo del tiempo, pero solo puede estar vinculada a un único registro con estado `ACTIVO` en un instante dado.
-4. **REGISTRO (1) ── (1..2) COMPROBANTE:**
-   * Cada registro genera obligatoriamente un comprobante de `ENTRADA` al ingresar y un comprobante de `SALIDA` al egresar del establecimiento.
-5. **REGISTRO (1) ── (0..N) NOVEDAD:**
-   * Durante la estancia de un vehículo pueden ocurrir o reportarse cero, una o múltiples novedades (rayones previos, fugas de aceite, golpes).
-6. **USUARIO (1) ── (0..N) NOVEDAD:**
-   * Cada novedad es reportada y firmada digitalmente por el usuario operador en turno (`reportado_por_id`).
-7. **USUARIO (0..1) ── (0..N) AUDITORIA_LOG:**
-   * Cada operación sensible ejecutada en el sistema genera una traza de auditoría asociada al usuario autenticado (o nula en caso de intentos no autenticados).
+### 1.1 Entidades y Atributos Conceptuales
+* **USUARIO:** Representa al personal autorizado para operar el sistema (operadores de garita y administradores).  
+  *Atributos:* Identificador, Nombres, Apellidos, Documento, Correo Electrónico, Teléfono, Clave de Acceso, Rol/Tipo, Estado Activo, Fecha de Registro.
+* **VEHICULO:** Automotores que ingresan a hacer uso de los servicios de parqueadero.  
+  *Atributos:* Identificador, Placa, Marca, Línea/Modelo, Color, Tipo de Vehículo, Documento Propietario, Nombre Propietario, Teléfono Propietario, Fecha de Registro.
+* **CELDA:** Espacios físicos demarcados y numerados donde se estacionan los vehículos.  
+  *Atributos:* Identificador, Número de Celda, Nivel/Piso, Tipo de Vehículo Admitido, Estado Actual, Observaciones Físicas.
+* **REGISTRO:** Transacción central que modela la estancia de un vehículo desde su ingreso hasta su retiro.  
+  *Atributos:* Identificador, Vehículo Asociado, Celda Asignada, Operador Entrada, Operador Salida, Fecha/Hora Entrada, Fecha/Hora Salida, Estado de Estancia, Observaciones de Turno.
+* **COMPROBANTE:** Documento probatorio emitido al conductor con código único y código QR.  
+  *Atributos:* Identificador, Registro Vinculado, Código Único, Tipo (Entrada/Salida), Fecha de Generación, Código QR en Base64.
+* **NOVEDAD:** Registro formal de incidentes, rayones, fugas o contingencias detectadas en el vehículo.  
+  *Atributos:* Identificador, Registro Asociado, Categoría de Novedad, Descripción Circunstanciada, Fecha/Hora, Operador Reportante, Evidencia Fotográfica (URL).
+* **AUDITORIA_LOG:** Pista de auditoría inmutable para supervisión de seguridad y operaciones.  
+  *Atributos:* Identificador, Usuario Ejecutor, Tipo de Operación, Entidad Afectada, ID del Registro, Dirección IP, Resultado de la Transacción, Timestamp, Detalle Técnico.
+
+### 1.2 Reglas del Negocio y Cardinalidades (MER)
+1. **USUARIO (1) ── (0..N) REGISTRO [Entrada]:** Un usuario operador puede admitir múltiples vehículos. Cada registro de entrada es efectuado obligatoriamente por un único usuario operador.
+2. **USUARIO (0..1) ── (0..N) REGISTRO [Salida]:** Un usuario operador puede registrar la salida de múltiples vehículos. Mientras un registro esté activo, el usuario de salida es nulo; al cerrarse, se vincula al operador en turno.
+3. **VEHICULO (1) ── (0..N) REGISTRO:** Un vehículo puede ingresar múltiples veces al parqueadero en diferentes fechas, pero solo puede tener **un registro en estado ACTIVO a la vez**.
+4. **CELDA (1) ── (0..N) REGISTRO:** Una celda física alberga a muchos vehículos a lo largo del tiempo, pero en un instante dado solo puede estar ocupada por un registro con estado ACTIVO.
+5. **REGISTRO (1) ── (1..2) COMPROBANTE:** Todo registro produce obligatoriamente un comprobante de ENTRADA al crearse y un comprobante de SALIDA al concluir la estancia.
+6. **REGISTRO (1) ── (0..N) NOVEDAD:** Una estancia vehicular puede no presentar novedades o reportar múltiples anomalías.
+7. **USUARIO (1) ── (0..N) NOVEDAD:** Cada novedad es registrada y firmada digitalmente por el usuario operador en servicio.
+8. **USUARIO (0..1) ── (0..N) AUDITORIA_LOG:** Toda acción sensible genera una traza de auditoría asociada al usuario autenticado.
 
 ---
 
 ## 2. Diagrama Entidad-Relación Físico (DER)
 
-Diagrama relacional generado en Mermaid con entidades, tipos de datos físicos, llaves primarias (PK), foráneas (FK) y cardinalidades:
-
 ```mermaid
 erDiagram
-    USUARIO ||--o{ REGISTRO : "registra_entrada"
-    USUARIO ||--o{ REGISTRO : "registra_salida"
-    USUARIO ||--o{ NOVEDAD : "reporta"
-    USUARIO ||--o{ AUDITORIA_LOG : "ejecuta"
+    USUARIO ||--o{ REGISTRO : "registra_entrada (1:N)"
+    USUARIO ||--o{ REGISTRO : "registra_salida (1:N)"
+    USUARIO ||--o{ NOVEDAD : "reporta (1:N)"
+    USUARIO ||--o{ AUDITORIA_LOG : "ejecuta (1:N)"
     
-    VEHICULO ||--o{ REGISTRO : "posee"
-    CELDA ||--o{ REGISTRO : "aloja"
+    VEHICULO ||--o{ REGISTRO : "posee (1:N)"
+    CELDA ||--o{ REGISTRO : "aloja (1:N)"
     
-    REGISTRO ||--|{ COMPROBANTE : "genera"
-    REGISTRO ||--o{ NOVEDAD : "presenta"
+    REGISTRO ||--|{ COMPROBANTE : "genera (1:N)"
+    REGISTRO ||--o{ NOVEDAD : "presenta (1:N)"
 
     USUARIO {
         bigint id PK
@@ -58,7 +66,7 @@ erDiagram
         varchar(120) correo UK
         varchar(20) telefono
         varchar(255) clave_hash
-        enum tipo "ADMINISTRADOR, OPERADOR"
+        enum tipo
         boolean activo
         datetime fecha_registro
     }
@@ -69,7 +77,7 @@ erDiagram
         varchar(50) marca
         varchar(50) modelo
         varchar(30) color
-        enum tipo "CARRO, MOTO, CAMIONETA"
+        enum tipo
         varchar(20) propietario_documento
         varchar(120) propietario_nombre
         varchar(20) propietario_telefono
@@ -80,8 +88,8 @@ erDiagram
         bigint id PK
         varchar(10) numero UK
         int piso
-        enum tipo_vehiculo "CARRO, MOTO, CAMIONETA"
-        enum estado "DISPONIBLE, OCUPADA, MANTENIMIENTO"
+        enum tipo_vehiculo
+        enum estado
         varchar(255) observaciones
     }
 
@@ -93,7 +101,7 @@ erDiagram
         bigint usuario_salida_id FK
         datetime fecha_hora_entrada
         datetime fecha_hora_salida
-        enum estado "ACTIVO, CERRADO, CANCELADO"
+        enum estado
         text observaciones
     }
 
@@ -101,7 +109,7 @@ erDiagram
         bigint id PK
         bigint registro_id FK
         varchar(40) codigo UK
-        enum tipo "ENTRADA, SALIDA"
+        enum tipo
         datetime fecha_generacion
         text qr_base64
     }
@@ -109,7 +117,7 @@ erDiagram
     NOVEDAD {
         bigint id PK
         bigint registro_id FK
-        enum tipo "RAYON, DANO_MECANICO, OBJETO_CAIDO, ROBO_PARCIAL, OTRO"
+        enum tipo
         text descripcion
         datetime fecha_hora
         bigint reportado_por_id FK
@@ -131,135 +139,260 @@ erDiagram
 
 ---
 
-## 3. Diccionario de Datos Exhaustivo
+## 3. Modelo Relacional Lógico (MR)
 
-### 3.1 Tabla: `usuario`
-Almacena las cuentas de usuario autorizadas para interactuar con la plataforma.
-* **Motor:** InnoDB | **Charset:** `utf8mb4` | **Collation:** `utf8mb4_unicode_ci`
+El **Modelo Relacional (MR)** traduce las entidades y relaciones a esquemas de tablas relacionales normalizadas en **Tercera Forma Normal (3FN)**:
+* **Primera Forma Normal (1FN):** Todos los atributos son atómicos (no existen grupos repetitivos ni atributos multivaluados).
+* **Segunda Forma Normal (2FN):** No existen dependencias funcionales parciales; todos los atributos no clave dependen en su totalidad de la clave primaria.
+* **Tercera Forma Normal (3FN):** No existen dependencias funcionales transitivas; ningún atributo no clave depende de otro atributo no clave.
 
-| Campo | Tipo de Dato | Nulo | Llave / Índice | Valor por Defecto | Descripción |
-|---|---|---|---|---|---|
-| `id` | BIGINT | NO | PK, AUTO_INCREMENT | N/A | Identificador único secuencial del usuario. |
-| `nombre` | VARCHAR(80) | NO | Ninguno | N/A | Nombres del usuario. |
-| `apellido` | VARCHAR(80) | NO | Ninguno | N/A | Apellidos del usuario. |
-| `documento` | VARCHAR(20) | NO | UK (`uk_usuario_documento`) | N/A | Cédula de ciudadanía o documento de identidad. |
-| `correo` | VARCHAR(120) | NO | UK (`uk_usuario_correo`) | N/A | Correo electrónico corporativo (login de acceso). |
-| `telefono` | VARCHAR(20) | SÍ | Ninguno | NULL | Número de contacto telefónico o móvil. |
-| `clave_hash` | VARCHAR(255) | NO | Ninguno | N/A | Hash criptográfico de la contraseña (BCrypt costo 10). |
-| `tipo` | ENUM | NO | Ninguno | 'OPERADOR' | Rol asignado: `'ADMINISTRADOR'` o `'OPERADOR'`. |
-| `activo` | BOOLEAN | NO | Ninguno | TRUE | Estado de habilitación de la cuenta en el sistema. |
-| `fecha_registro`| DATETIME | NO | Ninguno | CURRENT_TIMESTAMP | Fecha y hora en que se creó la cuenta en el sistema. |
+### Notación Relacional Estándar:
+* `<u>Atributo</u>`: Clave Primaria (Primary Key - PK)
+* `*Atributo*`: Clave Foránea (Foreign Key - FK)
+* `[UK]`: Clave Única Alternativa (Unique Key)
 
----
-
-### 3.2 Tabla: `vehiculo`
-Almacena el parque automotor registrado en el sistema.
-* **Motor:** InnoDB | **Charset:** `utf8mb4`
-
-| Campo | Tipo de Dato | Nulo | Llave / Índice | Valor por Defecto | Descripción |
-|---|---|---|---|---|---|
-| `id` | BIGINT | NO | PK, AUTO_INCREMENT | N/A | Identificador único del vehículo. |
-| `placa` | VARCHAR(10) | NO | UK (`uk_vehiculo_placa`) | N/A | Placa única (ej. `ABC123` para carro o `AB123C` para moto). |
-| `marca` | VARCHAR(50) | NO | Ninguno | N/A | Marca fabricante (ej. Renault, Chevrolet, Mazda). |
-| `modelo` | VARCHAR(50) | NO | Ninguno | N/A | Línea o modelo comercial (ej. Duster, Spark, CX-30). |
-| `color` | VARCHAR(30) | NO | Ninguno | N/A | Color exterior predominante del vehículo. |
-| `tipo` | ENUM | NO | Ninguno | 'CARRO' | Clasificación vehicular: `'CARRO'`, `'MOTO'`, `'CAMIONETA'`. |
-| `propietario_documento` | VARCHAR(20) | SÍ | Ninguno | NULL | Documento de identidad del titular del vehículo. |
-| `propietario_nombre` | VARCHAR(120) | SÍ | Ninguno | NULL | Nombre completo del propietario registrado. |
-| `propietario_telefono` | VARCHAR(20) | SÍ | Ninguno | NULL | Teléfono de notificación del propietario. |
-| `fecha_registro` | DATETIME | NO | Ninguno | CURRENT_TIMESTAMP | Timestamp de la primera vez que ingresó al sistema. |
-
----
-
-### 3.3 Tabla: `celda`
-Representa los espacios físicos de estacionamiento (bahías/cajones).
-* **Motor:** InnoDB | **Charset:** `utf8mb4`
-
-| Campo | Tipo de Dato | Nulo | Llave / Índice | Valor por Defecto | Descripción |
-|---|---|---|---|---|---|
-| `id` | BIGINT | NO | PK, AUTO_INCREMENT | N/A | Identificador único de la celda. |
-| `numero` | VARCHAR(10) | NO | UK (`uk_celda_numero`) | N/A | Nomenclatura física de la celda (ej. `A-01`, `B-04`). |
-| `piso` | INT | NO | Ninguno | N/A | Número de piso o nivel donde se localiza (1, 2, 3...). |
-| `tipo_vehiculo` | ENUM | NO | Ninguno | 'CARRO' | Tipo de vehículo admitido: `'CARRO'`, `'MOTO'`, `'CAMIONETA'`. |
-| `estado` | ENUM | NO | Ninguno | 'DISPONIBLE' | Estado actual: `'DISPONIBLE'`, `'OCUPADA'`, `'MANTENIMIENTO'`. |
-| `observaciones`| VARCHAR(255) | SÍ | Ninguno | NULL | Notas adicionales de infraestructura o dimensiones. |
+1. **USUARIO** (  
+   <u>id</u>, nombre, apellido, documento [UK], correo [UK], telefono, clave_hash, tipo, activo, fecha_registro  
+   )
+2. **VEHICULO** (  
+   <u>id</u>, placa [UK], marca, modelo, color, tipo, propietario_documento, propietario_nombre, propietario_telefono, fecha_registro  
+   )
+3. **CELDA** (  
+   <u>id</u>, numero [UK], piso, tipo_vehiculo, estado, observaciones  
+   )
+4. **REGISTRO** (  
+   <u>id</u>, *vehiculo_id*, *celda_id*, *usuario_entrada_id*, *usuario_salida_id*, fecha_hora_entrada, fecha_hora_salida, estado, observaciones  
+   )  
+   * FK `vehiculo_id` $\rightarrow$ `VEHICULO(id)`  
+   * FK `celda_id` $\rightarrow$ `CELDA(id)`  
+   * FK `usuario_entrada_id` $\rightarrow$ `USUARIO(id)`  
+   * FK `usuario_salida_id` $\rightarrow$ `USUARIO(id)`  
+5. **COMPROBANTE** (  
+   <u>id</u>, *registro_id*, codigo [UK], tipo, fecha_generacion, qr_base64  
+   )  
+   * FK `registro_id` $\rightarrow$ `REGISTRO(id)`  
+6. **NOVEDAD** (  
+   <u>id</u>, *registro_id*, tipo, descripcion, fecha_hora, *reportado_por_id*, evidencia_url  
+   )  
+   * FK `registro_id` $\rightarrow$ `REGISTRO(id)`  
+   * FK `reportado_por_id` $\rightarrow$ `USUARIO(id)`  
+7. **AUDITORIA_LOG** (  
+   <u>id</u>, *usuario_id*, operacion, entidad_afectada, registro_id, ip_origen, resultado, fecha_hora, detalle  
+   )  
+   * FK `usuario_id` $\rightarrow$ `USUARIO(id)`  
 
 ---
 
-### 3.4 Tabla: `registro`
-Entidad transaccional central que registra la estancia de un vehículo.
-* **Motor:** InnoDB | **Charset:** `utf8mb4`
+## 4. Modelo Físico (MF) – Diccionario de Datos y DDL SQL
 
-| Campo | Tipo de Dato | Nulo | Llave / Índice | Valor por Defecto | Descripción |
+El **Modelo Físico (MF)** define la implementación concreta en el motor relacional **MySQL 8.0** con motor transaccional **InnoDB** y codificación **`utf8mb4`**.
+
+### 4.1 Diccionario de Datos de Tablas Físicas
+
+#### Tabla: `usuario`
+| Columna | Tipo Físico | Nullable | Restricción | Default | Descripción |
 |---|---|---|---|---|---|
-| `id` | BIGINT | NO | PK, AUTO_INCREMENT | N/A | Identificador del registro de parqueo. |
-| `vehiculo_id` | BIGINT | NO | FK (`fk_registro_vehiculo`) | N/A | Referencia a la tabla `vehiculo.id`. |
-| `celda_id` | BIGINT | NO | FK (`fk_registro_celda`) | N/A | Referencia a la celda asignada en `celda.id`. |
-| `usuario_entrada_id` | BIGINT | NO | FK (`fk_registro_usuario_entrada`)| N/A | Operador que autorizó el ingreso (`usuario.id`). |
-| `usuario_salida_id` | BIGINT | SÍ | FK (`fk_registro_usuario_salida`) | NULL | Operador que autorizó la salida (`usuario.id`). |
-| `fecha_hora_entrada`| DATETIME | NO | Ninguno | CURRENT_TIMESTAMP | Fecha y hora exacta de admisión vehicular. |
-| `fecha_hora_salida` | DATETIME | SÍ | Ninguno | NULL | Fecha y hora exacta de salida (nula mientras esté activo). |
-| `estado` | ENUM | NO | INDEX (`idx_registro_estado`) | 'ACTIVO' | Estado de la estancia: `'ACTIVO'`, `'CERRADO'`, `'CANCELADO'`. |
-| `observaciones` | TEXT | SÍ | Ninguno | NULL | Anotaciones generales sobre el servicio. |
+| `id` | BIGINT | NO | PRIMARY KEY AUTO_INCREMENT | Auto | ID secuencial único |
+| `nombre` | VARCHAR(80) | NO | Ninguna | N/A | Nombre del usuario |
+| `apellido` | VARCHAR(80) | NO | Ninguna | N/A | Apellido del usuario |
+| `documento` | VARCHAR(20) | NO | UNIQUE (`uk_usuario_documento`) | N/A | Cédula / documento |
+| `correo` | VARCHAR(120) | NO | UNIQUE (`uk_usuario_correo`) | N/A | Correo institucional |
+| `telefono` | VARCHAR(20) | SÍ | Ninguna | NULL | Teléfono móvil |
+| `clave_hash` | VARCHAR(255) | NO | Ninguna | N/A | Hash BCrypt (costo 10) |
+| `tipo` | ENUM | NO | 'ADMINISTRADOR', 'OPERADOR' | 'OPERADOR' | Rol en la plataforma |
+| `activo` | BOOLEAN | NO | Ninguna | TRUE | Estado de habilitación |
+| `fecha_registro` | DATETIME | NO | Ninguna | CURRENT_TIMESTAMP | Timestamp de creación |
 
-* **Restricción CHECK:** `chk_registro_salida CHECK (estado = 'ACTIVO' OR fecha_hora_salida IS NOT NULL)`  
-  *Garantiza que ningún registro marcado como CERRADO o CANCELADO carezca de fecha/hora de salida.*
+#### Tabla: `vehiculo`
+| Columna | Tipo Físico | Nullable | Restricción | Default | Descripción |
+|---|---|---|---|---|---|
+| `id` | BIGINT | NO | PRIMARY KEY AUTO_INCREMENT | Auto | ID único de vehículo |
+| `placa` | VARCHAR(10) | NO | UNIQUE (`uk_vehiculo_placa`) | N/A | Placa colombiana |
+| `marca` | VARCHAR(50) | NO | Ninguna | N/A | Marca fabricante |
+| `modelo` | VARCHAR(50) | NO | Ninguna | N/A | Línea o modelo |
+| `color` | VARCHAR(30) | NO | Ninguna | N/A | Color del vehículo |
+| `tipo` | ENUM | NO | 'CARRO', 'MOTO', 'CAMIONETA' | 'CARRO' | Tipología vehicular |
+| `propietario_documento` | VARCHAR(20) | SÍ | Ninguna | NULL | Documento del titular |
+| `propietario_nombre` | VARCHAR(120) | SÍ | Ninguna | NULL | Nombre del titular |
+| `propietario_telefono` | VARCHAR(20) | SÍ | Ninguna | NULL | Teléfono del titular |
+| `fecha_registro` | DATETIME | NO | Ninguna | CURRENT_TIMESTAMP | Timestamp de alta |
+
+#### Tabla: `celda`
+| Columna | Tipo Físico | Nullable | Restricción | Default | Descripción |
+|---|---|---|---|---|---|
+| `id` | BIGINT | NO | PRIMARY KEY AUTO_INCREMENT | Auto | ID único de celda |
+| `numero` | VARCHAR(10) | NO | UNIQUE (`uk_celda_numero`) | N/A | Nomenclatura (ej. A-01) |
+| `piso` | INT | NO | Ninguna | N/A | Piso o nivel de ubicación |
+| `tipo_vehiculo` | ENUM | NO | 'CARRO', 'MOTO', 'CAMIONETA' | 'CARRO' | Tipo vehicular apto |
+| `estado` | ENUM | NO | 'DISPONIBLE', 'OCUPADA', 'MANTENIMIENTO' | 'DISPONIBLE' | Estado operativo |
+| `observaciones` | VARCHAR(255) | SÍ | Ninguna | NULL | Notas adicionales |
+
+#### Tabla: `registro`
+| Columna | Tipo Físico | Nullable | Restricción | Default | Descripción |
+|---|---|---|---|---|---|
+| `id` | BIGINT | NO | PRIMARY KEY AUTO_INCREMENT | Auto | ID único de estancia |
+| `vehiculo_id` | BIGINT | NO | FK (`vehiculo.id`) | N/A | Vehículo estacionado |
+| `celda_id` | BIGINT | NO | FK (`celda.id`) | N/A | Celda ocupada |
+| `usuario_entrada_id`| BIGINT | NO | FK (`usuario.id`) | N/A | Operador de entrada |
+| `usuario_salida_id` | BIGINT | SÍ | FK (`usuario.id`) | NULL | Operador de salida |
+| `fecha_hora_entrada`| DATETIME | NO | Ninguna | CURRENT_TIMESTAMP | Momento de ingreso |
+| `fecha_hora_salida` | DATETIME | SÍ | Ninguna | NULL | Momento de egreso |
+| `estado` | ENUM | NO | 'ACTIVO', 'CERRADO', 'CANCELADO' | 'ACTIVO' | Estado de la estancia |
+| `observaciones` | TEXT | SÍ | Ninguna | NULL | Anotaciones generales |
+* **Constraint CHECK:** `chk_registro_salida CHECK (estado = 'ACTIVO' OR fecha_hora_salida IS NOT NULL)`
+
+#### Tabla: `comprobante`
+| Columna | Tipo Físico | Nullable | Restricción | Default | Descripción |
+|---|---|---|---|---|---|
+| `id` | BIGINT | NO | PRIMARY KEY AUTO_INCREMENT | Auto | ID del comprobante |
+| `registro_id` | BIGINT | NO | FK (`registro.id`) | N/A | Estancia vinculada |
+| `codigo` | VARCHAR(40) | NO | UNIQUE (`uk_comprobante_codigo`) | N/A | Código único del ticket |
+| `tipo` | ENUM | NO | 'ENTRADA', 'SALIDA' | N/A | Tipo de comprobante |
+| `fecha_generacion` | DATETIME | NO | Ninguna | CURRENT_TIMESTAMP | Fecha de expedición |
+| `qr_base64` | TEXT | SÍ | Ninguna | NULL | Imagen QR en Base64 |
+
+#### Tabla: `novedad`
+| Columna | Tipo Físico | Nullable | Restricción | Default | Descripción |
+|---|---|---|---|---|---|
+| `id` | BIGINT | NO | PRIMARY KEY AUTO_INCREMENT | Auto | ID único de novedad |
+| `registro_id` | BIGINT | NO | FK (`registro.id`) | N/A | Estancia relacionada |
+| `tipo` | ENUM | NO | 'RAYON', 'DANO_MECANICO', 'OBJETO_CAIDO', 'ROBO_PARCIAL', 'OTRO' | N/A | Tipo de anomalía |
+| `descripcion` | TEXT | NO | Ninguna | N/A | Relato del incidente |
+| `fecha_hora` | DATETIME | NO | Ninguna | CURRENT_TIMESTAMP | Timestamp de novedad |
+| `reportado_por_id` | BIGINT | NO | FK (`usuario.id`) | N/A | Operador que reporta |
+| `evidencia_url` | VARCHAR(255) | SÍ | Ninguna | NULL | URL soporte fotográfico |
+
+#### Tabla: `auditoria_log`
+| Columna | Tipo Físico | Nullable | Restricción | Default | Descripción |
+|---|---|---|---|---|---|
+| `id` | BIGINT | NO | PRIMARY KEY AUTO_INCREMENT | Auto | ID secuencial del log |
+| `usuario_id` | BIGINT | SÍ | FK (`usuario.id`) | NULL | Usuario que actuó |
+| `operacion` | VARCHAR(50) | NO | Ninguna | N/A | Nombre de la operación |
+| `entidad_afectada` | VARCHAR(50) | SÍ | Ninguna | NULL | Tabla afectada |
+| `registro_id` | BIGINT | SÍ | Ninguna | NULL | ID del registro |
+| `ip_origen` | VARCHAR(45) | SÍ | Ninguna | NULL | IPv4 o IPv6 origen |
+| `resultado` | VARCHAR(20) | NO | Ninguna | N/A | 'EXITO', 'FALLO' |
+| `fecha_hora` | DATETIME | NO | INDEX (`idx_auditoria_fecha`)| CURRENT_TIMESTAMP | Timestamp de auditoría |
+| `detalle` | TEXT | SÍ | Ninguna | NULL | Datos de depuración |
 
 ---
 
-### 3.5 Tabla: `comprobante`
-Almacena los recibos o tickets emitidos con código de barras / QR bidimensional.
-* **Motor:** InnoDB | **Charset:** `utf8mb4`
+### 4.2 Script DDL SQL Completo (MySQL 8.0 / Flyway)
 
-| Campo | Tipo de Dato | Nulo | Llave / Índice | Valor por Defecto | Descripción |
-|---|---|---|---|---|---|
-| `id` | BIGINT | NO | PK, AUTO_INCREMENT | N/A | Identificador único del comprobante. |
-| `registro_id` | BIGINT | NO | FK (`fk_comprobante_registro`) | N/A | Referencia a `registro.id`. |
-| `codigo` | VARCHAR(40) | NO | UK (`uk_comprobante_codigo`) | N/A | Código alfanumérico único para validación rápida. |
-| `tipo` | ENUM | NO | Ninguno | N/A | Tipo de comprobante: `'ENTRADA'` o `'SALIDA'`. |
-| `fecha_generacion` | DATETIME | NO | Ninguno | CURRENT_TIMESTAMP | Timestamp exacto de creación del comprobante. |
-| `qr_base64` | TEXT | SÍ | Ninguno | NULL | Imagen del código QR codificada en formato Data URI Base64. |
+```sql
+-- Creación de tabla USUARIO
+CREATE TABLE usuario (
+    id              BIGINT       NOT NULL AUTO_INCREMENT,
+    nombre          VARCHAR(80)  NOT NULL,
+    apellido        VARCHAR(80)  NOT NULL,
+    documento       VARCHAR(20)  NOT NULL,
+    correo          VARCHAR(120) NOT NULL,
+    telefono        VARCHAR(20)  NULL,
+    clave_hash      VARCHAR(255) NOT NULL,
+    tipo            ENUM('ADMINISTRADOR','OPERADOR') NOT NULL DEFAULT 'OPERADOR',
+    activo          BOOLEAN      NOT NULL DEFAULT TRUE,
+    fecha_registro  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_usuario PRIMARY KEY (id),
+    CONSTRAINT uk_usuario_documento UNIQUE (documento),
+    CONSTRAINT uk_usuario_correo    UNIQUE (correo)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
----
+-- Creación de tabla VEHICULO
+CREATE TABLE vehiculo (
+    id                       BIGINT       NOT NULL AUTO_INCREMENT,
+    placa                    VARCHAR(10)  NOT NULL,
+    marca                    VARCHAR(50)  NOT NULL,
+    modelo                   VARCHAR(50)  NOT NULL,
+    color                    VARCHAR(30)  NOT NULL,
+    tipo                     ENUM('CARRO','MOTO','CAMIONETA') NOT NULL DEFAULT 'CARRO',
+    propietario_documento    VARCHAR(20)  NULL,
+    propietario_nombre       VARCHAR(120) NULL,
+    propietario_telefono     VARCHAR(20)  NULL,
+    fecha_registro           DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT pk_vehiculo PRIMARY KEY (id),
+    CONSTRAINT uk_vehiculo_placa UNIQUE (placa)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-### 3.6 Tabla: `novedad`
-Registra incidentes, daños mecánicos o anomalías detectadas en los vehículos.
-* **Motor:** InnoDB | **Charset:** `utf8mb4`
+-- Creación de tabla CELDA
+CREATE TABLE celda (
+    id            BIGINT      NOT NULL AUTO_INCREMENT,
+    numero        VARCHAR(10) NOT NULL,
+    piso          INT         NOT NULL,
+    tipo_vehiculo ENUM('CARRO','MOTO','CAMIONETA') NOT NULL DEFAULT 'CARRO',
+    estado        ENUM('DISPONIBLE','OCUPADA','MANTENIMIENTO') NOT NULL DEFAULT 'DISPONIBLE',
+    observaciones VARCHAR(255) NULL,
+    CONSTRAINT pk_celda PRIMARY KEY (id),
+    CONSTRAINT uk_celda_numero UNIQUE (numero)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-| Campo | Tipo de Dato | Nulo | Llave / Índice | Valor por Defecto | Descripción |
-|---|---|---|---|---|---|
-| `id` | BIGINT | NO | PK, AUTO_INCREMENT | N/A | Identificador único de la novedad. |
-| `registro_id` | BIGINT | NO | FK (`fk_novedad_registro`) | N/A | Referencia a la estancia vehicular en `registro.id`. |
-| `tipo` | ENUM | NO | Ninguno | N/A | Categoría: `'RAYON'`, `'DANO_MECANICO'`, `'OBJETO_CAIDO'`, `'ROBO_PARCIAL'`, `'OTRO'`. |
-| `descripcion` | TEXT | NO | Ninguno | N/A | Detalle minucioso de la novedad ocurrida. |
-| `fecha_hora` | DATETIME | NO | Ninguno | CURRENT_TIMESTAMP | Momento exacto del reporte. |
-| `reportado_por_id` | BIGINT | NO | FK (`fk_novedad_usuario`) | N/A | Usuario operador que diligencia el reporte (`usuario.id`). |
-| `evidencia_url` | VARCHAR(255) | SÍ | Ninguno | NULL | Enlace o ruta relativa a fotografía o soporte visual. |
+-- Creación de tabla REGISTRO
+CREATE TABLE registro (
+    id                 BIGINT   NOT NULL AUTO_INCREMENT,
+    vehiculo_id        BIGINT   NOT NULL,
+    celda_id           BIGINT   NOT NULL,
+    usuario_entrada_id BIGINT   NOT NULL,
+    usuario_salida_id  BIGINT   NULL,
+    fecha_hora_entrada DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_hora_salida  DATETIME NULL,
+    estado             ENUM('ACTIVO','CERRADO','CANCELADO') NOT NULL DEFAULT 'ACTIVO',
+    observaciones      TEXT     NULL,
+    CONSTRAINT pk_registro PRIMARY KEY (id),
+    CONSTRAINT fk_registro_vehiculo        FOREIGN KEY (vehiculo_id)        REFERENCES vehiculo (id),
+    CONSTRAINT fk_registro_celda           FOREIGN KEY (celda_id)           REFERENCES celda (id),
+    CONSTRAINT fk_registro_usuario_entrada FOREIGN KEY (usuario_entrada_id) REFERENCES usuario (id),
+    CONSTRAINT fk_registro_usuario_salida  FOREIGN KEY (usuario_salida_id)  REFERENCES usuario (id),
+    CONSTRAINT chk_registro_salida CHECK (estado = 'ACTIVO' OR fecha_hora_salida IS NOT NULL)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
----
+CREATE INDEX idx_registro_vehiculo ON registro (vehiculo_id);
+CREATE INDEX idx_registro_celda    ON registro (celda_id);
+CREATE INDEX idx_registro_estado   ON registro (estado);
 
-### 3.7 Tabla: `auditoria_log`
-Pista de auditoría inmutable para garantizar la trazabilidad operacional y de seguridad.
-* **Motor:** InnoDB | **Charset:** `utf8mb4`
+-- Creación de tabla NOVEDAD
+CREATE TABLE novedad (
+    id               BIGINT       NOT NULL AUTO_INCREMENT,
+    registro_id      BIGINT       NOT NULL,
+    tipo             ENUM('RAYON','DANO_MECANICO','OBJETO_CAIDO','ROBO_PARCIAL','OTRO') NOT NULL,
+    descripcion      TEXT         NOT NULL,
+    fecha_hora       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    reportado_por_id BIGINT       NOT NULL,
+    evidencia_url    VARCHAR(255) NULL,
+    CONSTRAINT pk_novedad PRIMARY KEY (id),
+    CONSTRAINT fk_novedad_registro FOREIGN KEY (registro_id)      REFERENCES registro (id),
+    CONSTRAINT fk_novedad_usuario  FOREIGN KEY (reportado_por_id) REFERENCES usuario (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-| Campo | Tipo de Dato | Nulo | Llave / Índice | Valor por Defecto | Descripción |
-|---|---|---|---|---|---|
-| `id` | BIGINT | NO | PK, AUTO_INCREMENT | N/A | Identificador único del log de auditoría. |
-| `usuario_id` | BIGINT | SÍ | FK (`fk_auditoria_usuario`) | NULL | Usuario que ejecutó la acción (NULL si falló autenticación). |
-| `operacion` | VARCHAR(50) | NO | Ninguno | N/A | Nombre de la operación (`LOGIN`, `REGISTRO_ENTRADA`, etc.). |
-| `entidad_afectada` | VARCHAR(50) | SÍ | Ninguno | NULL | Nombre de la entidad impactada (`registro`, `vehiculo`). |
-| `registro_id` | BIGINT | SÍ | Ninguno | NULL | ID del registro involucrado (si aplica). |
-| `ip_origen` | VARCHAR(45) | SÍ | Ninguno | NULL | Dirección IPv4 o IPv6 desde donde se emitió la petición. |
-| `resultado` | VARCHAR(20) | NO | Ninguno | N/A | Resultado: `'EXITO'`, `'FALLO'`, `'DENEGADO'`. |
-| `fecha_hora` | DATETIME | NO | INDEX (`idx_auditoria_fecha`)| CURRENT_TIMESTAMP | Marca de tiempo precisa del evento. |
-| `detalle` | TEXT | SÍ | Ninguno | NULL | Carga útil o información contextual adicional del evento. |
+CREATE INDEX idx_novedad_registro ON novedad (registro_id);
 
----
+-- Creación de tabla COMPROBANTE
+CREATE TABLE comprobante (
+    id               BIGINT       NOT NULL AUTO_INCREMENT,
+    registro_id      BIGINT       NOT NULL,
+    codigo           VARCHAR(40)  NOT NULL,
+    tipo             ENUM('ENTRADA','SALIDA') NOT NULL,
+    fecha_generacion DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    qr_base64        TEXT         NULL,
+    CONSTRAINT pk_comprobante PRIMARY KEY (id),
+    CONSTRAINT uk_comprobante_codigo UNIQUE (codigo),
+    CONSTRAINT fk_comprobante_registro FOREIGN KEY (registro_id) REFERENCES registro (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-## 4. Índices y Optimizaciones de Rendimiento
+CREATE INDEX idx_comprobante_registro ON comprobante (registro_id);
 
-1. `uk_usuario_documento` y `uk_usuario_correo`: B-Tree Unique Index para validación instantánea $O(1)$ en inicio de sesión.
-2. `uk_vehiculo_placa`: B-Tree Unique Index que agiliza la búsqueda de vehículos por placa al ingresar o salir.
-3. `idx_registro_vehiculo` y `idx_registro_celda`: Índices B-Tree que optimizan los `JOIN` relacionales frecuentes entre registros y sus vehículos/celdas.
-4. `idx_registro_estado`: Permite filtrar en milisegundos las consultas del dashboard sobre celdas ocupadas y registros activos (`WHERE estado = 'ACTIVO'`).
-5. `idx_auditoria_fecha`: Acelera la generación de reportes históricos de auditoría y exportación a formato CSV.
+-- Creación de tabla AUDITORIA_LOG
+CREATE TABLE auditoria_log (
+    id               BIGINT       NOT NULL AUTO_INCREMENT,
+    usuario_id       BIGINT       NULL,
+    operacion        VARCHAR(50)  NOT NULL,
+    entidad_afectada VARCHAR(50)  NULL,
+    registro_id      BIGINT       NULL,
+    ip_origen        VARCHAR(45)  NULL,
+    resultado        VARCHAR(20)  NOT NULL,
+    fecha_hora       DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    detalle          TEXT         NULL,
+    CONSTRAINT pk_auditoria PRIMARY KEY (id),
+    CONSTRAINT fk_auditoria_usuario FOREIGN KEY (usuario_id) REFERENCES usuario (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE INDEX idx_auditoria_fecha ON auditoria_log (fecha_hora);
+```
