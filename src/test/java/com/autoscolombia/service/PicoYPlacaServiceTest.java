@@ -75,13 +75,13 @@ class PicoYPlacaServiceTest {
 
     @Test
     void testViernes_Restringido_Digito7() {
-        LocalDateTime viernes = LocalDateTime.of(2026, Month.JANUARY, 10, 10, 0); // Viernes
+        LocalDateTime viernes = LocalDateTime.of(2026, Month.JANUARY, 9, 10, 0); // Viernes (9 de enero de 2026)
         assertFalse(picoYPlacaService.puedeTransitar("ABC127", viernes));
     }
 
     @Test
     void testViernes_Restringido_Digito8() {
-        LocalDateTime viernes = LocalDateTime.of(2026, Month.JANUARY, 10, 10, 0); // Viernes
+        LocalDateTime viernes = LocalDateTime.of(2026, Month.JANUARY, 9, 10, 0); // Viernes (9 de enero de 2026)
         assertFalse(picoYPlacaService.puedeTransitar("ABC128", viernes));
     }
 

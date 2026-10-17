@@ -76,7 +76,6 @@ class AuthServiceTest {
         when(usuarioRepository.findByCorreo(anyString())).thenReturn(Optional.of(usuario));
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
         when(jwtUtil.generateToken(any(UserDetails.class), anyString())).thenReturn("jwt-token");
-        when(jwtUtil.extractUsername(anyString())).thenReturn(usuario.getCorreo());
 
         AuthResponse resultado = authService.login(loginRequest);
 
@@ -109,7 +108,7 @@ class AuthServiceTest {
     void testLogin_UsuarioInactivo() {
         usuario.setActivo(false);
         when(usuarioRepository.findByCorreo(anyString())).thenReturn(Optional.of(usuario));
-        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
+        lenient().when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
 
         assertThrows(BusinessRuleException.class, () -> {
             authService.login(loginRequest);

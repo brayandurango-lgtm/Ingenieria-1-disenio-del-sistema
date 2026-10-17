@@ -50,13 +50,12 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
 
-        ValidationErrorResponse error = ValidationErrorResponse.builder()
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.BAD_REQUEST.value())
-                .error("Validation Error")
-                .message("Error de validación en los campos enviados")
-                .errors(errors)
-                .build();
+        ValidationErrorResponse error = new ValidationErrorResponse();
+        error.setTimestamp(LocalDateTime.now());
+        error.setStatus(HttpStatus.BAD_REQUEST.value());
+        error.setError("Validation Error");
+        error.setMessage("Error de validación en los campos enviados");
+        error.setErrors(errors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
