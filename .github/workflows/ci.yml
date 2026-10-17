@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   test:
     name: Ejecutar pruebas
@@ -22,7 +26,7 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Ejecutar pruebas y verificar cobertura
+      - name: Ejecutar pruebas y verificar empaquetado
         run: mvn clean verify
 
       - name: Generar reporte de cobertura
@@ -53,6 +57,12 @@ jobs:
       - name: Construir proyecto
         run: mvn clean package -DskipTests
 
+      - name: Preparar nombre de imagen en minúsculas
+        id: prep
+        run: |
+          REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "IMAGE_TAG=ghcr.io/${REPO_LOWER}/autos-colombia:latest" >> $GITHUB_ENV
+
       - name: Configurar Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -68,6 +78,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository }}/autos-colombia:latest
+          tags: ${{ env.IMAGE_TAG }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
