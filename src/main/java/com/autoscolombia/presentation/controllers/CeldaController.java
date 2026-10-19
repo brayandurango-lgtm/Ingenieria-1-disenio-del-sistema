@@ -51,6 +51,21 @@ public class CeldaController {
         return ResponseEntity.ok(dtos);
     }
 
+    @GetMapping("/disponibles")
+    @Operation(summary = "Listar celdas disponibles", description = "Retorna las celdas en estado DISPONIBLE, filtrables por tipo de vehículo")
+    public ResponseEntity<List<CeldaDTO>> listarDisponibles(
+            @RequestParam(required = false) TipoVehiculo tipo) {
+        List<Celda> celdas = celdaService.obtenerTodas().stream()
+                .filter(c -> c.getEstado() == EstadoCelda.DISPONIBLE)
+                .filter(c -> tipo == null || c.getTipoVehiculo() == tipo)
+                .collect(Collectors.toList());
+
+        List<CeldaDTO> dtos = celdas.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
+    }
+
     @GetMapping("/{id}")
     @Operation(summary = "Obtener celda por ID", description = "Retorna una celda específica")
     public ResponseEntity<CeldaDTO> obtenerPorId(@PathVariable Long id) {

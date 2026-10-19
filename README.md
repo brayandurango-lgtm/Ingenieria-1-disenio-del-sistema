@@ -3,9 +3,8 @@
 
 [![Java](https://img.shields.io/badge/Java-17%20LTS-orange.svg)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.5-brightgreen.svg)](https://spring.io/projects/spring-boot)
-[![MySQL](https://img.shields.io/badge/MySQL-8.0%20InnoDB-blue.svg)](https://www.mysql.com/)
-[![Tests](https://img.shields.io/badge/Tests-56%20Passed%20(100%25)-success.svg)]()
-[![JaCoCo](https://img.shields.io/badge/Coverage-%E2%89%A570%25-green.svg)]()
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue.svg)](https://www.postgresql.org/)
+[![Tests](https://img.shields.io/badge/Tests-Maven%20%2F%20JUnit-success.svg)]()
 
 ---
 
@@ -18,14 +17,13 @@
 * **Profesor:** Esteban Montoya Molina
 * **Fecha de Entrega y Ubicación:** Octubre 2026, Colombia, Antioquia, Medellín
 
-### 👥 Equipo de Trabajo y Roles Asignados (4 Integrantes)
+### 👤 Modalidad individual y roles asumidos
 
-| Nº | Integrante / Estudiante | Rol en el Proyecto | Responsabilidades Principales | Estado |
-|:---:|---|---|---|:---:|
-| **1** | **Brayan Alejandro Durango Urrea** | **Arquitecto Líder de Diseño** | **UML, MER, arquitectura de software, mockups UI/UX y revisión técnica** | **Completado (100%)** |
-| **2** | *Estudiante 2 (Asignado por equipo)* | Analista de Requerimientos | Requerimientos RF/RNF, historias de usuario y criterios de aceptación | En proceso por equipo |
-| **3** | *Estudiante 3 (Asignado por equipo)* | Desarrollador Backend | Código fuente Java/Spring Boot, repositorio GitHub, endpoints API | En proceso por equipo |
-| **4** | *Estudiante 4 (Asignado por equipo)* | Desarrollador Frontend / QA | Prototipos en Figma, interfaz web, pruebas de usuario y manuales | En proceso por equipo |
+| Estudiante | Roles asumidos | Alcance |
+|---|---|---|
+| **Brayan Alejandro Durango Urrea** | **Analista de Requerimientos, Desarrollador Backend y Desarrollador Frontend / QA** | Requerimientos e historias, API y persistencia, pruebas, wireframes y documentación. |
+
+> **Estado honesto de entregables:** el backend y sus pruebas están en el repositorio; los mockups actualmente son wireframes documentados, no un archivo o enlace de Figma; el modelo `.mdj` debe abrirse y verificarse en StarUML antes de considerarlo evidencia visual completa. El PDF se conserva localmente y no se versiona.
 
 ---
 
@@ -39,24 +37,29 @@ La **Iteración 1** se enfoca exclusivamente en el núcleo transaccional de **EN
 3. **Registro de Salida y Liquidación:** Búsqueda rápida por placa, cálculo automático del tiempo de permanencia, liberación transaccional de la celda de parqueo y emisión de comprobante de salida.
 4. **Gestión de Novedades e Incidencias:** Registro de daños previos, rayones o novedades en vehículos durante su estancia.
 5. **Dashboard Operativo y Reportes:** Indicadores clave de ocupación en tiempo real y exportación de reportes en formato CSV.
-6. **Auditoría Transversal:** Pista inmutable de auditoría para cada operación sensible realizada en garita.
+6. **Auditoría Transversal:** Pista de auditoría para operaciones sensibles registradas por la aplicación.
+
+> **Alcance real de la interfaz:** entrada, búsqueda/salida, dashboard y registro de novedades están conectados con la API. No se han implementado pantallas CRUD de usuarios/celdas, liquidación/cobro de pagos ni un prototipo externo en Figma; esos ítems no se deben dar por terminados.
 
 ---
 
-## 🏛️ Entregables del Rol 1 (Arquitecto Líder de Diseño)
+## 🏛️ Entregables de documentación y diseño
 
 Toda la documentación técnica y de diseño elaborada para esta iteración se encuentra disponible en la carpeta [`docs/`](./docs/):
 
 * 📐 **[01. Documento de Arquitectura de Software (SAD)](./docs/01_ARQUITECTURA_DEL_SISTEMA.md):**  
-  Estilo arquitectónico en 4 capas, Modelo C4 (Contexto, Contenedores, Componentes, Despliegue), Atributos de Calidad (RNF) y Decisiones de Arquitectura (ADRs 01 a 06).
+   Arquitectura en capas, Modelo C4, atributos de calidad y decisiones de arquitectura; revisar las notas de coherencia con PostgreSQL.
 * 📊 **[02. Especificación de Diagramas UML](./docs/02_DIAGRAMAS_UML.md):**  
-  Diagrama de Casos de Uso (CU-01 a CU-13), Diagrama de Clases UML del dominio, Diagramas de Secuencia (Login, Entrada, Salida, Novedades), Diagramas de Estados y Paquetes.
+   Especificación textual y diagramas Mermaid de casos de uso, clases y paquetes; archivo nativo en `docs/staruml/`.
 * 🗄️ **[03. Modelo Entidad-Relación (MER / DER) y Diccionario de Datos](./docs/03_MODELO_ENTIDAD_RELACION_MER.md):**  
   Diagrama DER en sintaxis Mermaid, cardinalidades conceptuales, diccionario exhaustivo de las 7 tablas (`usuario`, `vehiculo`, `celda`, `registro`, `novedad`, `comprobante`, `auditoria_log`) e integridad referencial.
 * 🎨 **[04. Mockups y Arquitectura Visual de Interfaz](./docs/04_MOCKUPS_ARQUITECTURA_VISUAL.md):**  
-  Arquitectura de información, guía de estilos (design system), mockups estructurados de las 6 pantallas clave y lineamientos de integración para el Desarrollador Frontend.
+   Design system y wireframes de baja fidelidad en Markdown. No reemplazan un prototipo Figma ni incluyen un enlace Figma.
 * 🔍 **[05. Revisión Técnica y Auditoría de Arquitectura](./docs/05_REVISION_TECNICA_ARQUITECTURA.md):**  
-  Auditoría de código, corrección de deuda técnica (desacoplamiento de dependencia circular de Spring Security y ciclo de vida JPA `@Builder.Default`/`@PrePersist`), principios SOLID y Matriz de Trazabilidad Técnica (RF vs Código vs BD vs Tests).
+   Trazabilidad y observaciones técnicas. Los resultados de pruebas deben actualizarse desde la ejecución actual, no inferirse de cifras históricas.
+* 📚 **[06. Requerimientos e Historias de Usuario](./docs/06_REQUERIMIENTOS_E_HISTORIAS_DE_USUARIO.md)** y **[07. Backend y API](./docs/07_DESARROLLO_BACKEND_Y_API.md)**.
+* 📄 **[Documento final editable en HTML](./docs/EVIDENCIA_DE_APRENDIZAJE_1_DOCUMENTO_FINAL.html):** fuente del informe; el PDF generado se conserva localmente, fuera del control de versiones.
+* 🗃️ **Esquema PostgreSQL ejecutable:** [migración Flyway](./src/main/resources/db/migration/V1__schema_inicial.sql). El DDL MySQL histórico de algunos documentos no debe ejecutarse.
 
 ---
 
@@ -69,7 +72,11 @@ Ingenieria - Evidencia de aprendizaje 1/
 │   ├── 02_DIAGRAMAS_UML.md                # Diagramas UML (Clases, Secuencia, Casos de Uso)
 │   ├── 03_MODELO_ENTIDAD_RELACION_MER.md  # DER, MER y Diccionario de Datos
 │   ├── 04_MOCKUPS_ARQUITECTURA_VISUAL.md  # Wireframes y Mockups de Interfaz
-│   ├── 05_REVISION_TECNICA_ARQUITECTURA.md# Auditoría de código y matriz de trazabilidad
+│   ├── 05_REVISION_TECNICA_ARQUITECTURA.md # Revisión y trazabilidad
+│   ├── 06_REQUERIMIENTOS_E_HISTORIAS_DE_USUARIO.md
+│   ├── 07_DESARROLLO_BACKEND_Y_API.md
+│   ├── EVIDENCIA_DE_APRENDIZAJE_1_DOCUMENTO_FINAL.html # Fuente editable del informe
+│   ├── staruml/                            # Proyecto UML editable
 │   └── postman/                           # Colección de pruebas de API REST
 │       └── autos-colombia.postman_collection.json
 ├── src/
@@ -93,11 +100,14 @@ Ingenieria - Evidencia de aprendizaje 1/
 │   │       ├── application.yml            # Configuración general
 │   │       ├── application-dev.yml        # Perfil local / Docker
 │   │       └── application-test.yml       # Perfil de pruebas H2 en memoria
-│   └── test/java/com/autoscolombia/       # Suite de 56 Pruebas Automatizadas
-│       ├── integration/                   # Pruebas de integración de controladores
+│   └── test/
+│       ├── java/com/autoscolombia/        # Pruebas unitarias y de integración
+│       └── js/app.test.js                 # Pruebas de humo del frontend
+│       └── integration/                   # Pruebas de integración de controladores
 │       └── service/                       # Pruebas unitarias con Mockito
 ├── .github/workflows/                     # Pipeline de CI/CD (GitHub Actions)
-├── docker-compose.yml                     # Orquestación de contenedores (App + MySQL)
+├── docker-compose.yml                     # Orquestación de contenedores (App + PostgreSQL)
+│   └── main/resources/static/              # Interfaz web HTML, CSS y JavaScript
 ├── Dockerfile                             # Empaquetado de imagen de producción
 ├── pom.xml                                # Dependencias Maven y configuración JaCoCo
 └── README.md                              # Documentación general del proyecto
@@ -113,48 +123,55 @@ Ingenieria - Evidencia de aprendizaje 1/
 | **Framework Backend** | Spring Boot | 3.2.5 |
 | **Seguridad** | Spring Security 6 + JWT | JJWT 0.12.6 (Stateless) |
 | **Persistencia** | Spring Data JPA / Hibernate | Jakarta Persistence 3.1 |
-| **Base de Datos** | MySQL Server | 8.0 (Motor InnoDB, utf8mb4) |
+| **Base de Datos** | PostgreSQL | Versión 16 en Docker; base local `Garajeautomovil` |
 | **Migraciones BD** | Flyway | Integrado con Spring Boot |
 | **Códigos QR** | Google ZXing | 3.5.2 |
 | **Documentación API**| Springdoc OpenAPI (Swagger) | 2.5.0 |
-| **Pruebas Automatizadas**| JUnit 5 + Mockito + JaCoCo | 56 pruebas con cobertura $\ge 70\%$ |
-| **Contenedores** | Docker & Docker Compose | Contenedores para API y MySQL |
+| **Pruebas Automatizadas**| JUnit 5 + Mockito + JaCoCo y Node.js | 57 pruebas Java; 4 pruebas de interfaz |
+| **Cobertura actual** | JaCoCo | 54,9% líneas; meta 70% pendiente |
+| **Contenedores** | Docker & Docker Compose | Contenedores para API y PostgreSQL |
 
 ---
 
 ## 🚀 Guía de Instalación y Ejecución
 
-### Opción 1: Ejecución con Docker Compose (Recomendada)
+### Opción 1: Ejecución con Docker Compose
 
 1. Clonar el repositorio y acceder al directorio:
    ```bash
    git clone https://github.com/brayandurango-lgtm/Ingenieria-1-disenio-del-sistema.git
    cd "Ingenieria - Evidencia de aprendizaje 1"
    ```
-2. Levantar los servicios de base de datos y backend:
+2. Definir secretos de desarrollo en el entorno (no los guardes en Git):
+   ```powershell
+   $env:DB_PASSWORD = "una-clave-local"
+   $env:JWT_SECRET = "una-clave-de-firma-larga-para-desarrollo"
+   ```
+3. Levantar los servicios de base de datos y backend:
    ```bash
    docker-compose up --build
    ```
-3. El sistema estará disponible en:
+4. El sistema estará disponible en:
    * **API REST:** `http://localhost:8080`
    * **Documentación Swagger UI:** `http://localhost:8080/swagger-ui.html`
    * **OpenAPI Docs (JSON):** `http://localhost:8080/v3/api-docs`
 
 ---
 
-### Opción 2: Ejecución Local con Maven y MySQL
+### Opción 2: Ejecución local con Maven y PostgreSQL
 
-1. Crear la base de datos en MySQL local:
+1. Crear la base de datos PostgreSQL si aún no existe (usa el nombre configurado, por defecto `Garajeautomovil`):
    ```sql
-   CREATE DATABASE autos_colombia CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   CREATE DATABASE "Garajeautomovil";
    ```
-2. Configurar variables de entorno (o usar las predeterminadas):
+2. Configurar las variables de entorno en PowerShell:
    ```bash
-   export DB_HOST=localhost
-   export DB_PORT=3306
-   export DB_USER=root
-   export DB_PASSWORD=tu_password
-   export JWT_SECRET=autos-colombia-secret-key-2026-muy-largo-y-seguro-para-firma-HS256
+   $env:DB_HOST="localhost"
+   $env:DB_PORT="5432"
+   $env:DB_NAME="Garajeautomovil"
+   $env:DB_USER="postgres"
+   $env:DB_PASSWORD="la-clave-local"
+   $env:JWT_SECRET="una-clave-de-firma-larga-para-desarrollo"
    ```
 3. Compilar el proyecto y ejecutar la aplicación:
    ```bash
@@ -204,7 +221,7 @@ El script inicial de Flyway pre-carga dos usuarios con contraseñas encriptadas 
 
 ## 🧪 Ejecución de Pruebas Automatizadas
 
-El proyecto cuenta con una suite completa de pruebas unitarias y de integración que valida el 100% de los servicios, repositorios y controladores:
+Ejecuta las pruebas unitarias y de integración desde Maven:
 
 ```bash
 # Ejecutar todas las pruebas unitarias y de integración
@@ -214,7 +231,17 @@ mvn clean test
 mvn jacoco:report
 ```
 
-> **Resultado actual:** **56 pruebas ejecutadas exitosamente (0 fallos, 0 errores, 0 omitidas)**. El informe de cobertura generado por JaCoCo puede consultarse abriendo en el navegador el archivo `target/site/jacoco/index.html`.
+> El número de pruebas y la cobertura cambian con el código. Verifica el resultado de `mvn clean verify`; el informe JaCoCo se genera en `target/site/jacoco/index.html` y `target/` no se versiona.
+
+### Pruebas del frontend estático
+
+El frontend no requiere empaquetador ni dependencias npm. Ejecuta las pruebas con Node.js:
+
+```powershell
+node --test src/test/js/app.test.js
+```
+
+Para probar la experiencia completa con la API, inicia Spring Boot, abre `http://localhost:8080` y autentícate con un usuario sembrado por Flyway. Comprueba inicio de sesión válido e inválido, registro de entrada, placa duplicada, búsqueda y salida, dashboard, novedad y cierre de sesión.
 
 ---
 
@@ -222,3 +249,6 @@ mvn jacoco:report
 
 Proyecto desarrollado con fines académicos en la **Institución Universitaria Digital de Antioquia (IU Digital)** como parte del programa de Ingeniería de Software (Semestre 6).  
 **Medellín, Antioquia, Colombia - Octubre 2026.**
+
+<!-- Fin del README -->
+

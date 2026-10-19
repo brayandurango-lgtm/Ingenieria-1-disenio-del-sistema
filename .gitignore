@@ -3,6 +3,7 @@
 
 # Log files
 *.log
+logs_arranque.txt
 
 # Package Files
 *.jar
@@ -45,3 +46,9 @@ HELP.md
 # Application properties with sensitive data
 application-local.yml
 application-local.properties
+.env
+.env.*
+!.env.example
+
+# Entregable PDF: conservar localmente, no versionar
+S20_Evidencia_Aprendizaje_1_Autos_Colombia.pdf

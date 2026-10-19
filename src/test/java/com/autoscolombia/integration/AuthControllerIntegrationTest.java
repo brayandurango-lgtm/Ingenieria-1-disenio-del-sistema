@@ -105,4 +105,12 @@ class AuthControllerIntegrationTest {
         mockMvc.perform(get("/api/v1/registros/activos"))
                 .andExpect(status().isUnauthorized());
     }
+
+        @Test
+        void testInterfazWebDisponibleSinToken() throws Exception {
+                mockMvc.perform(get("/index.html"))
+                                .andExpect(status().isOk())
+                                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+                                .andExpect(content().string(org.hamcrest.Matchers.containsString("Autos Colombia")));
+        }
 }

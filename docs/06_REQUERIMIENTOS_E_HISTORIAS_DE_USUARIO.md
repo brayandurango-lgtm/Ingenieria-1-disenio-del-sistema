@@ -5,7 +5,8 @@
 **Asignatura:** Ingeniería de Software  
 **Grupo:** [PREICA2602B020081](https://iudigital.instructure.com/courses/28333)  
 **Profesor:** Esteban Montoya Molina  
-**Estudiante:** Brayan Alejandro Durango Urrea (Arquitecto Líder de Diseño)  
+**Roles asumidos:** Analista de Requerimientos, Desarrollador Backend y Desarrollador Frontend / QA (modalidad individual)
+**Estudiante:** Brayan Alejandro Durango Urrea
 **Fecha y Ubicación:** Octubre 2026, Medellín, Antioquia, Colombia  
 
 ---
@@ -16,12 +17,12 @@
 |---|---|---|---|---|
 | **RF-01** | Autenticación y Control de Acceso | Operador, Admin | El sistema debe permitir a los usuarios identificarse con correo electrónico y contraseña encriptada, generando un token JWT para la sesión. | Token JWT válido por 8 horas emitido. Bloqueo de cuenta tras 3 intentos fallidos por 15 minutos. |
 | **RF-02** | Registro de Entrada Vehicular | Operador | El sistema debe capturar la placa, tipo, marca, modelo, color y datos del propietario (opcional) al ingresar un vehículo a las instalaciones. | Formato de placa validado (colombiano: `ABC123` o `AB123C`). Creación de registro en estado `ACTIVO`. |
-| **RF-03** | Validación de Pico y Placa | Sistema | El sistema debe verificar en tiempo real si el vehículo tiene restricción de circulación según la normativa distrital de Bogotá D.C. | Verifica el último dígito numérico según día hábil de la semana. Notifica al operador si tiene restricción. |
-| **RF-04** | Asignación Automática de Celda | Sistema | El sistema debe buscar la primera celda física disponible adecuada para la tipología del vehículo (`CARRO`, `MOTO`, `CAMIONETA`) y asignarla atómicamente. | La celda pasa a estado `OCUPADA`. Si no hay celdas disponibles, rechaza el ingreso con error descriptivo. |
-| **RF-05** | Emisión de Comprobante de Entrada (QR) | Sistema | El sistema debe generar un comprobante digital/imprimible con código alfanumérico único, datos de estancia y un código QR en Base64. | Código QR escaneable que contiene id de registro, placa, celda asignada y fecha/hora exacta. |
-| **RF-06** | Registro de Salida Vehicular | Operador | El sistema debe permitir registrar el egreso del vehículo buscando por su número de placa activa, cerrando el ciclo de estancia. | El registro pasa de `ACTIVO` a `CERRADO`. Se guarda la fecha/hora de salida y se calcula el tiempo total de permanencia. |
+| **RF-03** | Validación de Pico y Placa | Sistema | El sistema debe verificar si la placa estaría restringida según las reglas implementadas para días hábiles en Bogotá D.C. | Verifica el último carácter de la placa según día de la semana. El comportamiento real actual rechaza la entrada si está restringida; no es solo una alerta. |
+| **RF-04** | Asignación Automática de Celda | Sistema | El sistema debe buscar la primera celda disponible adecuada para la tipología del vehículo (`CARRO`, `MOTO`, `CAMIONETA`) y asignarla durante la transacción de entrada. | La celda pasa a estado `OCUPADA`. Si no hay celdas disponibles, rechaza el ingreso con error descriptivo. El bloqueo atómico frente a múltiples admisiones simultáneas debe reforzarse y probarse antes de prometer exclusión de carreras. |
+| **RF-05** | Emisión de Comprobante de Entrada (QR) | Sistema | El sistema genera el comprobante y código QR con el servicio de entrada. | La entrada retorna el DTO de registro; el frontend consulta después `GET /api/v1/comprobantes?registroId={id}` para leer el QR. |
+| **RF-06** | Registro de Salida Vehicular | Operador | El sistema permite cerrar la estancia activa, identificada por placa. | El registro pasa de `ACTIVO` a `CERRADO`; la duración se expresa en minutos. |
 | **RF-07** | Liberación Automática de Celda | Sistema | Al confirmarse la salida del vehículo, el sistema debe cambiar el estado de la celda asociada para que vuelva a estar libre. | La celda pasa inmediatamente a estado `DISPONIBLE` para recibir nuevos vehículos. |
-| **RF-08** | Emisión de Comprobante de Salida (QR) | Sistema | El sistema debe generar un comprobante final de salida con código QR que detalle el tiempo total de estancia y las observaciones de retiro. | Código QR de salida generado y almacenado en la tabla `comprobante`. |
+| **RF-08** | Emisión de Comprobante de Salida (QR) | Sistema | El sistema genera un comprobante al completar la salida. | Verificar y documentar el DTO/consulta de salida antes de prometer entrega del QR de salida: la API de salida devuelve un `RegistroDTO`, no el comprobante. |
 | **RF-09** | Consulta y Búsqueda de Vehículos | Operador, Admin | El sistema debe permitir consultar vehículos registrados filtrando por placa, nombre o documento del propietario y tipo de vehículo. | Retorna coincidencias parciales o exactas con paginación y ordenamiento. |
 | **RF-10** | Registro y Gestión de Novedades | Operador | El sistema debe permitir reportar daños, rayones, fugas mecánicas u objetos dejados en el vehículo durante su estancia. | Novedad tipificada (`RAYON`, `DANO_MECANICO`, etc.), con descripción obligatoria y URL de soporte fotográfico. |
 | **RF-11** | Cancelación de Registro Erróneo | Operador, Admin | El sistema debe permitir anular un registro activo en caso de equivocación de placa o cancelación inmediata del servicio. | El registro pasa a `CANCELADO`, la celda se libera a `DISPONIBLE` y se registra el motivo de anulación. |
@@ -40,9 +41,9 @@
 | **RNF-03** | **Seguridad** | Autorización y control de acceso basado en roles (RBAC). | Roles `ADMINISTRADOR` y `OPERADOR` validados en cada endpoint con Spring Security. |
 | **RNF-04** | **Rendimiento** | Tiempo de respuesta en operaciones transaccionales de garita. | Menor a 500 ms en el percentil 95 ($P_{95}$) para registrar entrada o salida. |
 | **RNF-05** | **Concurrencia** | Manejo de transacciones atómicas y prevención de condiciones de carrera. | Transacciones `@Transactional` en aislamiento por defecto y bloqueo en asignación de celdas. |
-| **RNF-06** | **Disponibilidad** | Persistencia relacional ACID y recuperación ante fallos. | Motor MySQL 8.0 InnoDB con soporte de transacciones seguras y volumen Docker persistente. |
+| **RNF-06** | **Disponibilidad** | Persistencia relacional ACID y recuperación ante fallos. | PostgreSQL con transacciones seguras y volumen Docker persistente. |
 | **RNF-07** | **Mantenibilidad** | Código fuente modular, desacoplado y arquitectura en capas. | Principios SOLID, separación estricta en 4 capas (Presentación, Dominio, Infraestructura, Datos). |
-| **RNF-08** | **Portabilidad** | Despliegue agnóstico del sistema operativo subyacente. | Contenedorización mediante Docker y Docker Compose (Java 17 OpenJDK + MySQL 8.0). |
+| **RNF-08** | **Portabilidad** | Despliegue agnóstico del sistema operativo subyacente. | Contenedorización mediante Docker y Docker Compose (Java 17 OpenJDK + PostgreSQL 16). |
 | **RNF-09** | **Calidad de Código** | Pruebas automatizadas de cobertura y regresión. | Cobertura de pruebas unitarias e integración superior al 70% verificada con JaCoCo. |
 | **RNF-10** | **Usabilidad** | Diseño de interfaces ágil y optimizado para garita de parqueo. | Registro de entrada completable en menos de 3 clics y 10 segundos por vehículo. |
 
@@ -80,7 +81,7 @@
 * **Quiero:** Que el sistema verifique si la placa ingresada tiene restricción de Pico y Placa en Bogotá  
 * **Para:** Advertir al usuario o cumplir con las políticas de control vial antes de admitirlo  
 * **Criterios de Aceptación:**
-  * **Dado** un día lunes hábil y una placa terminada en 6 o 9, **cuando** se valida la placa, **entonces** el sistema alerta que aplica restricción de Pico y Placa.
+  * **Dado** un día lunes y una placa terminada en 6 o 9, **cuando** se intenta registrar la entrada, **entonces** el servicio actual rechaza la operación con una regla de negocio (HTTP 400); cambiarlo a advertencia no bloqueante requiere una modificación posterior.
   * **Dado** un día sábado, domingo o festivo, **cuando** ingresa cualquier vehículo, **entonces** el sistema certifica que no aplica restricción.
 
 ---
@@ -91,8 +92,8 @@
 * **Quiero:** Recibir un ticket impreso o digital con los datos de mi estancia y un código QR  
 * **Para:** Tener soporte de recepción de mi vehículo y facilitar mi salida ágil  
 * **Criterios de Aceptación:**
-  * **Dado** un registro de entrada exitoso, **cuando** se guarda la transacción, **entonces** el sistema genera un ticket con código alfanumérico único y la imagen del código QR codificada en Base64.
-  * **Dado** el código QR generado, **cuando** es escaneado por un dispositivo óptico, **entonces** se extrae el identificador del ticket y la placa asociada.
+  * **Dado** un registro de entrada exitoso, **cuando** se confirma la transacción, **entonces** el backend guarda un comprobante con código y QR Base64.
+  * **Dado** el registro creado, **cuando** el cliente consulta `GET /api/v1/comprobantes?registroId={id}`, **entonces** recibe el comprobante que contiene el QR. La lectura óptica del QR debe probarse por separado.
 
 ---
 
@@ -138,3 +139,84 @@
 * **Criterios de Aceptación:**
   * **Dado** un usuario con rol `ADMINISTRADOR`, **cuando** solicita la exportación a través de `/api/v1/reportes/ocupacion`, **entonces** el sistema genera un archivo `reporte_ocupacion.csv` con cabeceras formateadas y registros ordenados cronológicamente.
   * **Dado** un usuario con rol `OPERADOR`, **cuando** intenta descargar el reporte, **entonces** el sistema restringe el acceso con un error 403 Forbidden.
+
+---
+
+## 4. Reglas de Negocio Oficiales (RN)
+
+| Código | Nombre de la Regla | Descripción y Restricción Lógica |
+|---|---|---|
+| **RN-01** | Formato de Placas Vehiculares | La placa debe cumplir con el formato oficial del Ministerio de Transporte de Colombia: 3 letras y 3 números para automóviles particulares/comerciales (`^[A-Z]{3}[0-9]{3}$`), o 3 letras, 2 números y 1 letra para motocicletas (`^[A-Z]{3}[0-9]{2}[A-Z]$`). Las letras siempre se almacenan en mayúsculas sin guiones ni espacios. |
+| **RN-02** | Política Distrital de Pico y Placa | La restricción vehicular aplica en días hábiles (lunes a viernes de 6:00 a.m. a 9:00 p.m.). En días pares tienen restricción las placas terminadas en números pares (0, 2, 4, 6, 8) y en días impares las terminadas en números impares (1, 3, 5, 7, 9). Si el vehículo ingresa con restricción, el sistema no bloquea el parqueo pero emite una alerta visual y registra la advertencia en el ticket. |
+| **RN-03** | Asignación de Celdas por Tipología | Un vehículo solo puede ocupar una celda que coincida con su tipo (`CARRO` en celda `CARRO`, `MOTO` en celda `MOTO`, `CAMIONETA` en celda `CAMIONETA`). La asignación se realiza mediante búsqueda atómica de la celda de menor identificador disponible. |
+| **RN-04** | Exclusividad de Estancia Activa | Un vehículo no puede tener más de un registro en estado `ACTIVO` simultáneamente. Si una placa ya se encuentra dentro de las instalaciones, se rechaza cualquier nuevo intento de admisión con código HTTP 409 Conflict. |
+| **RN-05** | Cálculo del Tiempo de Permanencia | El tiempo de permanencia se calcula como la diferencia en minutos entre la `fechaSalida` y la `fechaEntrada`. Si la permanencia es menor a 1 minuto, se liquida como 1 minuto mínimo. |
+| **RN-06** | Registro Inmutable de Auditoría | Toda acción de creación de registros, cierre de estancia, reporte de novedades y cancelación debe generar un registro automático e inalterable en `auditoria_log` con el usuario autenticado, IP del cliente, timestamp y detalles. |
+
+---
+
+## 5. Diagramas de Flujo de Procesos de Negocio
+
+### 5.1 Flujo Operativo de Registro de Entrada
+```mermaid
+flowchart TD
+    Inicio([Vehículo llega a garita]) --> Captura[Operador ingresa Placa y Tipo]
+    Captura --> ValidaFormato{¿Formato de placa válido?}
+    ValidaFormato -- No --> ErrorPlaca[Mostrar error de formato] --> Captura
+    ValidaFormato -- Sí --> ValidaActivo{¿Vehículo ya tiene registro ACTIVO?}
+    ValidaActivo -- Sí --> ErrorActivo[Rechazar ingreso: Vehículo ya adentro] --> Fin([Fin])
+    ValidaActivo -- No --> EvalPicoPlaca[Evaluar Pico y Placa distrital]
+    EvalPicoPlaca --> BuscaCelda[Buscar celda disponible según tipo]
+    BuscaCelda --> HayCelda{¿Hay celda libre?}
+    HayCelda -- No --> ErrorCupo[Rechazar: Sin celdas disponibles] --> Fin
+    HayCelda -- Sí --> AsignaCelda[Marcar celda como OCUPADA]
+    AsignaCelda --> CreaRegistro[Crear Registro en estado ACTIVO]
+    CreaRegistro --> GeneraTicket[Generar Comprobante con Código QR]
+    GeneraTicket --> ImprimeTicket[Entregar ticket impreso/digital al conductor]
+    ImprimeTicket --> AbreTalanquera[Abrir talanquera de acceso] --> Fin
+```
+
+### 5.2 Flujo Operativo de Registro de Salida
+```mermaid
+flowchart TD
+    InicioSalida([Vehículo se presenta en garita de salida]) --> BuscaPlaca[Operador digita placa o escanea QR]
+    BuscaPlaca --> ExisteActivo{¿Existe registro ACTIVO?}
+    ExisteActivo -- No --> ErrorNoExiste[Error 404: Vehículo no encontrado en patio] --> FinSalida([Fin])
+    ExisteActivo -- Sí --> ConsultaNovedad{¿Tiene novedades reportadas?}
+    ConsultaNovedad -- Sí --> MuestraNovedades[Mostrar novedades al conductor] --> ConfirmaSalida
+    ConsultaNovedad -- No --> ConfirmaSalida[Confirmar egreso vehicular]
+    ConfirmaSalida --> CalculaTiempo[Calcular minutos de permanencia]
+    CalculaTiempo --> LiberaCelda[Cambiar celda a DISPONIBLE]
+    LiberaCelda --> CierraRegistro[Actualizar registro a CERRADO con fechaSalida]
+    CierraRegistro --> GeneraSalidaQR[Generar Comprobante de Salida con QR]
+    GeneraSalidaQR --> RegistraAudit[Registrar evento en auditoria_log]
+    RegistraAudit --> AbreSalida[Abrir talanquera de salida] --> FinSalida
+```
+
+---
+
+## 6. Matriz de Trazabilidad (RF vs HU vs Criterios de Aceptación)
+
+| Requerimiento Funcional | Historia de Usuario | Criterios de Aceptación (Gherkin) | Regla de Negocio |
+|---|---|---|---|
+| **RF-01: Autenticación** | `HU-01` | Credenciales válidas -> Token JWT emitido (8h)<br>Contraseña errónea -> 401 Unauthorized<br>3 fallos consecutivos -> Bloqueo temporal | RN-06 |
+| **RF-02: Registro Entrada** | `HU-02` | Placa válida + no activa -> Registro ACTIVO creado<br>Placa ya dentro -> 409 Conflict | RN-01, RN-04 |
+| **RF-03: Pico y Placa** | `HU-03` | Lunes placa 6 o 9 -> Entrada rechazada HTTP 400<br>Sábados/Domingos -> Sin restricción | RN-02 |
+| **RF-04: Asignación Celda** | `HU-02` | Celda libre de su tipología -> Asignada y OCUPADA<br>Sin celdas libres -> Rechazo con 400 Bad Request | RN-03 |
+| **RF-05: Ticket QR Entrada** | `HU-04` | Entrada exitosa -> Consultar comprobante con `GET /api/v1/comprobantes?registroId={id}` | RN-06 |
+| **RF-06: Registro Salida** | `HU-05` | Registro ACTIVO -> Registro pasa a CERRADO<br>Placa no encontrada -> 404 Not Found | RN-05 |
+| **RF-07: Liberación Celda** | `HU-05` | Confirmación de salida -> Celda pasa a DISPONIBLE | RN-03 |
+| **RF-08: Ticket QR Salida** | `HU-05` | La API de salida devuelve `RegistroDTO`; confirmar por separado endpoint/flujo para consultar comprobante tipo SALIDA | RN-05, RN-06 |
+| **RF-09: Búsqueda Vehículos** | `HU-02`, `HU-05` | Filtro por placa, tipo o propietario -> Resultados paginados | RN-01 |
+| **RF-10: Novedades** | `HU-06` | Detección de daño -> Formulario con tipo, descripción y foto | RN-06 |
+| **RF-11: Cancelación Registro**| `HU-02` | Registro erróneo -> Anulado a CANCELADO, celda liberada | RN-03, RN-06 |
+| **RF-12: Dashboard Celdas** | `HU-07` | Carga de panel -> Indicadores y métricas en tiempo real | RN-03 |
+| **RF-13: Reporte CSV** | `HU-08` | Rol Admin -> Descarga archivo CSV estructurado<br>Rol Operador -> 403 Forbidden | RN-06 |
+| **RF-14: Auditoría** | `HU-01` a `HU-08`| Operaciones críticas registradas en `auditoria_log` | RN-06 |
+
+---
+
+**Fin de la especificación funcional y matriz de trazabilidad.**
+
+---
+

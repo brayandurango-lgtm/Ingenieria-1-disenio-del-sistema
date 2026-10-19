@@ -170,8 +170,8 @@
 
   <div class="cover-box">
     <p><strong>Estudiante:</strong> Brayan Alejandro Durango Urrea</p>
-    <p><strong>Rol Asignado:</strong> 1 - Arquitecto Líder de Diseño</p>
-    <p><strong>Equipo de Trabajo:</strong> Grupo 4 Estudiantes (Roles 1, 2, 3 y 4)</p>
+    <p><strong>Modalidad:</strong> Trabajo individual</p>
+    <p><strong>Roles asumidos:</strong> Analista de Requerimientos, Desarrollador Backend y Desarrollador Frontend / QA</p>
     <p><strong>Profesor:</strong> Esteban Montoya Molina</p>
     <p><strong>Grupo / Aula:</strong> PREICA2602B020081</p>
     <p><strong>Asignatura:</strong> Ingeniería de Software</p>
@@ -213,7 +213,7 @@ El parqueadero comercial <strong>"Autos Colombia"</strong> presta servicios de e
 En el marco de la asignatura <strong>Ingeniería de Software</strong> de la <strong>IU Digital de Antioquia</strong>, se desarrolla la <strong>Iteración 1</strong> enfocada de manera prioritaria en el flujo crítico del negocio: <strong>Gestión de la Entrada y Salida de Vehículos</strong>.
 </p>
 <p>
-El presente informe documenta de manera consolidada y formal el trabajo ejecutado por el equipo de cuatro (4) integrantes, liderado en la parte de diseño y arquitectura por el estudiante <strong>Brayan Alejandro Durango Urrea</strong> (Rol 1: Arquitecto Líder de Diseño), integrando los modelos UML en StarUML, el diseño de bases de datos relacionales (MER, MR y MF), la especificación de requerimientos, historias de usuario, prototipos de interfaz en Figma y el código fuente respaldado por 56 pruebas automatizadas en GitHub.
+Este informe documenta el trabajo individual de <strong>Brayan Alejandro Durango Urrea</strong> en los roles de Analista de Requerimientos, Desarrollador Backend y Desarrollador Frontend / QA. Reúne requerimientos e historias de usuario, arquitectura y modelos de datos, una interfaz web servida por Spring Boot y una suite de pruebas. Los wireframes de este repositorio son especificaciones textuales: todavía no existe un prototipo real ni un enlace de Figma. El proyecto StarUML contiene elementos de modelo y diagramas declarados, pero requiere completar y validar sus vistas gráficas en StarUML antes de presentarlo como evidencia visual final.
 </p>
 
 <div class="page-break"></div>
@@ -335,10 +335,10 @@ El presente informe documenta de manera consolidada y formal el trabajo ejecutad
     <tr><td><strong>RNF-03</strong></td><td>Seguridad</td><td>Control de acceso basado en roles (RBAC).</td><td>Roles ADMINISTRADOR y OPERADOR.</td></tr>
     <tr><td><strong>RNF-04</strong></td><td>Rendimiento</td><td>Tiempo de respuesta en operaciones transaccionales.</td><td>$P_{95} < 500$ ms.</td></tr>
     <tr><td><strong>RNF-05</strong></td><td>Concurrencia</td><td>Manejo atómico de transacciones de celdas.</td><td>Transacciones ACID con HikariCP.</td></tr>
-    <tr><td><strong>RNF-06</strong></td><td>Disponibilidad</td><td>Persistencia relacional confiable.</td><td>MySQL 8.0 InnoDB con volumen Docker.</td></tr>
+    <tr><td><strong>RNF-06</strong></td><td>Disponibilidad</td><td>Persistencia relacional confiable.</td><td>PostgreSQL y volumen Docker persistente.</td></tr>
     <tr><td><strong>RNF-07</strong></td><td>Mantenibilidad</td><td>Arquitectura modular en 4 capas.</td><td>Principios SOLID y Clean Code.</td></tr>
     <tr><td><strong>RNF-08</strong></td><td>Portabilidad</td><td>Despliegue multi-plataforma en contenedores.</td><td>Docker y Docker Compose.</td></tr>
-    <tr><td><strong>RNF-09</strong></td><td>Calidad</td><td>Cobertura de pruebas automatizadas.</td><td>JaCoCo con cobertura $ge 70%$.</td></tr>
+    <tr><td><strong>RNF-09</strong></td><td>Calidad</td><td>Cobertura de pruebas automatizadas.</td><td>Umbral objetivo ≥ 70%; resultado JaCoCo actual: 54,8% de líneas (pendiente de alcanzar).</td></tr>
     <tr><td><strong>RNF-10</strong></td><td>Usabilidad</td><td>Agilidad de atención en garita de entrada.</td><td>Operación completable en $< 10$ s.</td></tr>
   </tbody>
 </table>
@@ -447,14 +447,14 @@ El sistema implementa una <strong>Arquitectura en Capas Desacopladas (Layered Ar
                                     │ Pool HikariCP (JDBC)
                                     ▼
 ┌────────────────────────────────────────────────────────────────────────┐
-│ 4. CAPA DE PERSISTENCIA (MySQL 8.0 InnoDB - utf8mb4)                   │
+│ 4. CAPA DE PERSISTENCIA (PostgreSQL - base Garajeautomovil)            │
 └────────────────────────────────────────────────────────────────────────┘
 </pre>
 
 <h3 class="subsection-title">4.2 Decisiones de Arquitectura (ADRs)</h3>
 <ul>
   <li><strong>ADR-01:</strong> Uso de Spring Boot 3.2.5 con Java 17 LTS por estabilidad, soporte y seguridad con Jakarta EE 10.</li>
-  <li><strong>ADR-02:</strong> Base de datos relacional MySQL 8.0 InnoDB para garantizar transacciones ACID en celdas de parqueo.</li>
+  <li><strong>ADR-02:</strong> Base de datos relacional PostgreSQL para garantizar transacciones ACID en celdas de parqueo.</li>
   <li><strong>ADR-03:</strong> Desacoplamiento de <code>PasswordEncoderConfig</code> para eliminar dependencias circulares en Spring Security.</li>
   <li><strong>ADR-04:</strong> Asignación automática de celdas por tipo de vehículo mediante ordenamiento natural $O(1)$ de celdas disponibles.</li>
   <li><strong>ADR-05:</strong> Encapsulamiento de la regla de Pico y Placa en <code>PicoYPlacaService</code> para fácil actualización normativa.</li>
@@ -464,9 +464,9 @@ El sistema implementa una <strong>Arquitectura en Capas Desacopladas (Layered Ar
 <div class="page-break"></div>
 
 <!-- ENTREGABLE 4 -->
-<h2 class="section-title">5. Entregable 4: Mockups de las Historias de Usuario (Figma)</h2>
+<h2 class="section-title">5. Entregable 4: Wireframes y frontend web</h2>
 <p>
-Como parte del diseño de experiencia de usuario (UI/UX), se diseñaron los wireframes y especificaciones visuales correspondientes a cada Historia de Usuario:
+Se implementó un frontend web adaptable en <code>src/main/resources/static/</code> y se documentaron wireframes textuales. Estos materiales no son un prototipo creado en Figma. Para completar el requisito académico de Figma hace falta crear el archivo en esa plataforma y añadir su enlace y capturas.
 </p>
 
 <h3 class="subsection-title">Mockup 1: Pantalla de Autenticación / Login (HU-01)</h3>
@@ -758,9 +758,9 @@ Organización lógica de paquetes en Java/Spring Boot modelada en StarUML:
 El código fuente se encuentra completamente implementado, probado y versionado en el repositorio oficial de GitHub del estudiante:
 </p>
 <div class="alert-box">
-  <strong>URL del Repositorio Oficial en GitHub:</strong><br>
+  <strong>URL del Repositorio GitHub:</strong><br>
   <a href="https://github.com/brayandurango-lgtm/Ingenieria-1-disenio-del-sistema.git" target="_blank">https://github.com/brayandurango-lgtm/Ingenieria-1-disenio-del-sistema.git</a><br>
-  <em>(Rama principal: <code>main</code> - Estado: Sincronizado, Autoría: Alejandro Urrea, 0 bots)</em>
+  <em>(Rama principal: <code>main</code>. La sincronización del commit actual debe verificarse después de publicarlo.)</em>
 </div>
 
 <h3 class="subsection-title">8.1 Certificación de Pruebas Automatizadas</h3>
@@ -782,7 +782,7 @@ Se ejecutó la suite completa de pruebas unitarias y de integración mediante Ap
 [INFO] Results:
 [INFO] Tests run: 56, Failures: 0, Errors: 0, Skipped: 0
 [INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS - Cobertura JaCoCo >= 70%
+[INFO] BUILD SUCCESS - 56 pruebas aprobadas. JaCoCo: líneas cubiertas 54,8% (objetivo de cobertura ≥ 70% aún pendiente).
 [INFO] ------------------------------------------------------------------------
 </pre>
 
@@ -792,7 +792,7 @@ Se ejecutó la suite completa de pruebas unitarias y de integración mediante Ap
 <ol style="font-size: 10pt; line-height: 1.8;">
   <li><strong>Solidez Arquitectónica:</strong> La separación estricta en 4 capas (Presentación, Dominio, Infraestructura y Datos) garantiza que la lógica de negocio de parqueadero (Pico y Placa, celdas y QR) permanezca inmune a cambios en frameworks web o motores de bases de datos.</li>
   <li><strong>Resolución de Deuda Técnica:</strong> El desacoplamiento temprano de la configuración criptográfica (<code>PasswordEncoderConfig</code>) y la corrección del ciclo de vida JPA con Lombok (<code>@Builder.Default</code> y <code>@PrePersist</code>) evitaron bloqueos operacionales en garita y fallos de persistencia en tiempo de ejecución.</li>
-  <li><strong>Trazabilidad y Calidad Garantizada:</strong> La correspondencia biunívoca entre los requerimientos (RF-01 a RF-14), los diagramas en StarUML, el esquema relacional en 3FN y las 56 pruebas automatizadas certifica que la Iteración 1 satisface a cabalidad las especificaciones de la actividad académica.</li>
+  <li><strong>Calidad y trabajo pendiente:</strong> Las 56 pruebas pasan en la verificación ejecutada, pero la cobertura JaCoCo de líneas es 54,8% y no alcanza aún la meta de 70%. Falta construir y enlazar el prototipo Figma, completar y validar las vistas gráficas de StarUML y comprobar cada requisito contra la rúbrica antes de considerar cerrada la iteración.</li>
 </ol>
 
 <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 25px 0;">

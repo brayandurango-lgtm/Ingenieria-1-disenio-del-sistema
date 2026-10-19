@@ -13,7 +13,7 @@
 
 ## 1. Arquitectura de Información y Mapa de Navegación
 
-Como **Arquitecto Líder de Diseño**, se define la estructura jerárquica de vistas y flujos de usuario orientada a una experiencia ágil y con cero distracciones en la garita de control.
+Como diseño de la interfaz se define la estructura jerárquica de vistas y flujos orientada a una experiencia ágil en garita. Los wireframes de este documento son especificaciones textuales, no capturas de Figma ni un prototipo alojado allí.
 
 ```
 [ Iniciar Sesión (/login) ]
@@ -71,6 +71,8 @@ Para guiar el trabajo del **Rol 4 (Desarrollador Frontend / QA)** en Figma y en 
 ---
 
 ## 3. Wireframes y Mockups Estructurados
+
+**Estado de implementación:** se implementó una interfaz web adaptable en `src/main/resources/static/index.html`, `styles.css` y `app.js`, servida por Spring Boot y conectada a la API. Esta entrega no es un prototipo Figma; para acreditar el requisito específico de Figma aún se debe crear/publicar el archivo en esa plataforma y añadir aquí su enlace y capturas.
 
 ### Mockup 1: Pantalla de Autenticación / Login
 * **Ruta:** `/login` | **Actor:** Operador / Administrador  

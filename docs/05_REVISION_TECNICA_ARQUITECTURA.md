@@ -22,10 +22,10 @@ El objetivo de esta revisión fue:
 4. Validar la calidad del software mediante la ejecución de la suite de pruebas automatizadas (unitarias e integración).
 5. Construir la **Matriz de Trazabilidad Técnica** que conecta los requerimientos funcionales con cada artefacto de software.
 
-**Resultado Global de la Auditoría:** **CONFORME Y APROBADO PARA DESPLIEGUE**.  
-* Pruebas ejecutadas: **56 pruebas (100% exitosas, 0 fallos, 0 errores, 0 omitidas)**.
-* Cobertura de código JaCoCo: **Supera el umbral mínimo del 70%**.
-* Estado de dependencias cíclicas: **0 ciclos de beans**.
+**Resultado Global de la Auditoría:** **VERIFICADO LOCALMENTE CON PENDIENTES; NO CERTIFICADO PARA DESPLIEGUE**.
+* Pruebas Java ejecutadas: **57 pruebas (0 fallos, 0 errores, 0 omitidas)**; pruebas de humo frontend ejecutadas por separado: **4 aprobadas**.
+* Cobertura de código JaCoCo: la última medición repetible debe generarse con `mvn clean verify`; la medición verificada en esta revisión fue **54,8% de líneas**, inferior al objetivo RNF-09 del 70%.
+* Estado de dependencias cíclicas: no se reportaron ciclos de beans durante el arranque de pruebas.
 
 ---
 
@@ -49,7 +49,7 @@ Durante la revisión técnica se detectaron tres (3) aspectos de diseño que req
 * **Diagnóstico:** Las entidades JPA (`Usuario`, `Vehiculo`, `Registro`, `Celda`, `Comprobante`, `Novedad`, `AuditoriaLog`) definían campos obligatorios con valores por defecto (ej. `private LocalDateTime fechaRegistro = LocalDateTime.now();`). Sin embargo, al utilizar el patrón `@Builder` de Lombok sin la anotación `@Builder.Default`, Lombok ignoraba las inicializaciones de campo y seteaba los atributos en `null`. Al persistir la entidad, el motor de Bean Validation (`jakarta.validation`) lanzaba una excepción `ConstraintViolationException` con el mensaje: *"La fecha de registro es obligatoria"*.
 * **Solución Arquitectónica Implementada:**
   1. Se agregó la anotación `@Builder.Default` en todos los campos que poseen valores predeterminados de negocio en todas las entidades.
-  2. Se implementaron métodos `@PrePersist` en cada entidad de dominio como salvaguarda defensiva para asegurar que nunca se envíen campos nulos a la base de datos MySQL o H2 en caso de instanciación manual.
+  2. Se implementaron métodos `@PrePersist` en entidades de dominio como salvaguarda defensiva para evitar valores nulos al persistir en PostgreSQL o H2.
 
 ---
 
@@ -79,7 +79,7 @@ Durante la revisión técnica se detectaron tres (3) aspectos de diseño que req
   5. `celdaRepository.deleteAll()`
   6. `vehiculoRepository.deleteAll()`
   7. `usuarioRepository.deleteAll()`
-  Permitiendo que las 56 pruebas unitarias y de integración se ejecuten al 100% de manera determinista y reproducible.
+  La ejecución local verificada reporta 57 pruebas Java aprobadas (0 fallos, 0 errores y 0 omitidas); además pasan 4 pruebas Node del frontend. El resultado debe repetirse en CI para confirmar reproducibilidad.
 
 ---
 
@@ -127,7 +127,7 @@ La siguiente matriz certifica que cada requerimiento funcional cuenta con sus co
 * **Protección contra Fuerza Bruta:** Bloqueo temporal en memoria tras 3 intentos fallidos consecutivos por cuenta durante 15 minutos.
 * **Tokens JWT:** Firma criptográfica HMAC-SHA256 con clave secreta exteriorizada por variable de entorno `JWT_SECRET`. Claims incluyen sujeto (correo) y rol de usuario.
 * **Control de Autorización (RBAC):** Endpoints administrativos (creación de usuarios, exportación de reportes CSV) restringidos al rol `ADMINISTRADOR`.
-* **Prevención de Inyección SQL:** Spring Data JPA utiliza consultas preparadas (PreparedStatements) parametrizadas a través de Hibernate, mitigando el riesgo de inyecciones SQL maliciosas.
+* **Prevención de Inyección SQL:** Spring Data JPA/Hibernate parametriza las consultas de repositorio; se recomienda mantener parametrizados todos los filtros y consultas dinámicas.
 
 ---
 
@@ -137,4 +137,4 @@ Para los siguientes ciclos de desarrollo a cargo del equipo de trabajo, el Arqui
 1. **Módulo de Tarifas y Facturación:** Incorporar tabla de tarifas diferenciadas por tipo de vehículo y tiempo (cobro por minutos/fracciones y mensualidades recurrentes).
 2. **Reconocimiento Óptico de Placas (LPR/OCR):** Evaluar la integración de cámaras de visión artificial en garita para prellenar la placa automáticamente en la interfaz.
 3. **Mecanismo de Notificaciones Push/WhatsApp:** Envío automático del comprobante QR al teléfono del propietario registrado al ingresar o salir.
-4. **Caché Distribuida con Redis:** Al escalar a múltiples parqueaderos o celdas (>1000 celdas), implementar Redis para cachear el estado de disponibilidad de celdas y evitar consultas recurrentes a MySQL.
+4. **Caché Distribuida con Redis:** Al escalar a múltiples parqueaderos o celdas (>1000 celdas), implementar Redis para cachear el estado de disponibilidad y evitar consultas recurrentes a PostgreSQL.

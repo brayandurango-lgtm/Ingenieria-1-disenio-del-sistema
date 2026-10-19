@@ -16,11 +16,7 @@
 ### 1.1 Propósito del Documento
 El presente documento define la arquitectura integral de software para la **Iteración 1** del sistema de información de **Autos Colombia**, empresa dedicada a la operación de parqueaderos vehiculares bajo la modalidad de mensualidad y control de flujo de vehículos. 
 
-Como **Arquitecto Líder de Diseño**, este documento establece los lineamientos, patrones, modelos de vistas arquitectónicas, decisiones de diseño técnico (ADRs) y atributos de calidad que guían el trabajo colaborativo de los cuatro (4) roles del equipo:
-1. **Arquitecto Líder de Diseño** (Brayan Alejandro Durango Urrea): UML, MER, arquitectura, mockups y revisión técnica.
-2. **Analista de Requerimientos**: Especificación de RF/RNF, historias de usuario y criterios de aceptación.
-3. **Desarrollador Backend**: Código fuente Java/Spring Boot, API REST, persistencia y repositorio GitHub.
-4. **Desarrollador Frontend / QA**: Implementación de interfaz de usuario en Figma/Web, suite de pruebas y documentación operativa.
+El proyecto se desarrolla en modalidad individual. **Brayan Alejandro Durango Urrea** asume los roles de Analista de Requerimientos (RF/RNF e historias), Desarrollador Backend (API y persistencia) y Desarrollador Frontend / QA (interfaz web, pruebas y documentación). La interfaz web implementada no equivale a un prototipo de Figma.
 
 ### 1.2 Alcance de la Iteración 1
 La **Iteración 1** se enfoca de manera prioritaria y exhaustiva en el núcleo transaccional del negocio:
@@ -68,8 +64,8 @@ El backend implementa un patrón estricto de **Arquitectura en 4 Capas** desacop
                                ▼
 ┌─────────────────────────────────────────────────────────────┐
 │ 4. CAPA DE DATOS Y PERSISTENCIA (Database Layer)            │
-│    - MySQL 8.0 con motor InnoDB                             │
-│    - Charset UTF-8 Multibyte (utf8mb4_unicode_ci)           │
+│    - PostgreSQL (base local Garajeautomovil)                │
+│    - Codificación UTF-8 y transacciones ACID                │
 │    - Integridad referencial con Foreign Keys y Checks       │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -118,8 +114,8 @@ graph TD
     end
 
     subgraph DataHost ["Servidor de Base de Datos (Docker)"]
-        Database["Base de Datos Relacional<br/>[MySQL 8.0 InnoDB]<br/>Almacena usuarios, vehículos, celdas y registros"]
-        VolumeStorage["Volumen Docker Persistente<br/>[mysql_data]<br/>Persistencia física de datos"]
+        Database["Base de Datos Relacional<br/>[PostgreSQL 16]<br/>Almacena usuarios, vehículos, celdas y registros"]
+        VolumeStorage["Volumen Docker Persistente<br/>[db_data]<br/>Persistencia física de datos"]
     end
 
     Browser -->|HTTP REST / JSON / Bearer JWT (Puerto 8080)| BackendApp
@@ -207,7 +203,7 @@ graph TD
    * Código desacoplado siguiendo principios SOLID y Clean Code.
    * Contenedorización completa con Docker y orquestación con Docker Compose.
    * Control de versiones de esquema de base de datos con Flyway para despliegues reproducibles.
-   * Cobertura de pruebas automatizadas superior al 70% verificada mediante JaCoCo.
+    * Objetivo de cobertura automatizada superior al 70% mediante JaCoCo; la última medición local verificada fue 54,9% de líneas, por lo que esta meta sigue pendiente.
 
 ---
 
@@ -219,10 +215,10 @@ graph TD
 * **Decisión:** Adoptar Java 17 LTS con Spring Boot 3.2.5 aprovechando el nuevo Spring Security 6, Jakarta EE 10 y mejoras de rendimiento de la JVM.
 * **Consecuencias:** Mayor productividad, ecosistema maduro de pruebas (JUnit 5, Mockito) e integración nativa con Swagger OpenAPI.
 
-### ADR-02: Base de Datos Relacional MySQL 8.0 con Motor InnoDB y Flyway
+### ADR-02: Base de Datos Relacional PostgreSQL y Flyway
 * **Estado:** Aprobado.
 * **Contexto:** El negocio de parqueadero requiere consistencia estricta en el estado de ocupación de celdas y auditoría financiera/operativa.
-* **Decisión:** Utilizar MySQL 8.0 con motor transaccional InnoDB, cotejamiento `utf8mb4_unicode_ci` y migraciones automáticas con Flyway.
+* **Decisión:** Utilizar PostgreSQL para la base local `Garajeautomovil` y PostgreSQL 16 en Docker, con migraciones automáticas mediante Flyway.
 * **Consecuencias:** Garantía ACID contra pérdidas de datos y evolución controlada del esquema DDL en equipo.
 
 ### ADR-03: Seguridad Stateless con Tokens JWT y Desacoplamiento de PasswordEncoder
@@ -261,15 +257,15 @@ graph TD
                 AppProcess["Spring Boot Application<br/>Puerto interno: 8080<br/>JVM 17 OpenJDK"]
             end
             
-            subgraph DBContainer ["Contenedor autos-colombia-mysql"]
-                DBProcess["MySQL 8.0 Daemon<br/>Puerto interno: 3306<br/>Database: autos_colombia"]
+            subgraph DBContainer ["Contenedor PostgreSQL"]
+                DBProcess["PostgreSQL 16<br/>Puerto interno: 5432<br/>Database: garajeautomovil"]
             end
         end
 
         HostPort8080["Puerto Host: 8080"] -->|Mapeo de puerto| AppProcess
         HostPort3306["Puerto Host: 3306"] -->|Mapeo de puerto| DBProcess
         
-        DockerVolume["Docker Named Volume: mysql_data"] ---|Punto de montaje /var/lib/mysql| DBProcess
+        DockerVolume["Docker Named Volume: db_data"] ---|Punto de montaje PostgreSQL| DBProcess
     end
 
     ExternalClient["Cliente Web / Postman / Swagger"] -->|TCP HTTP :8080| HostPort8080

@@ -185,7 +185,7 @@ El **Modelo Relacional (MR)** traduce las entidades y relaciones a esquemas de t
 
 ## 4. Modelo Físico (MF) – Diccionario de Datos y DDL SQL
 
-El **Modelo Físico (MF)** define la implementación concreta en el motor relacional **MySQL 8.0** con motor transaccional **InnoDB** y codificación **`utf8mb4`**.
+El **Modelo Físico (MF)** define la implementación concreta en **PostgreSQL** (base local `Garajeautomovil`; PostgreSQL 16 en Docker). El script Flyway del proyecto es la fuente de verdad del esquema y usa tipos `BIGINT IDENTITY`, `VARCHAR`, `BOOLEAN`, `TIMESTAMP` y restricciones `CHECK` propios del diseño relacional portable.
 
 ### 4.1 Diccionario de Datos de Tablas Físicas
 
@@ -277,7 +277,9 @@ El **Modelo Físico (MF)** define la implementación concreta en el motor relaci
 
 ---
 
-### 4.2 Script DDL SQL Completo (MySQL 8.0 / Flyway)
+### 4.2 DDL histórico (MySQL; no ejecutar)
+
+El DDL ejecutable y versionado es [`V1__schema_inicial.sql`](../src/main/resources/db/migration/V1__schema_inicial.sql), escrito para PostgreSQL. Las declaraciones MySQL históricas que se conservan a continuación son únicamente referencia y **no deben ejecutarse**; el modelo físico exacto del proyecto es el de la migración PostgreSQL.
 
 ```sql
 -- Creación de tabla USUARIO
