@@ -58,6 +58,7 @@ Toda la documentación técnica y de diseño elaborada para esta iteración se e
 * 🔍 **[05. Revisión Técnica y Auditoría de Arquitectura](./docs/05_REVISION_TECNICA_ARQUITECTURA.md):**  
    Trazabilidad y observaciones técnicas. Los resultados de pruebas deben actualizarse desde la ejecución actual, no inferirse de cifras históricas.
 * 📚 **[06. Requerimientos e Historias de Usuario](./docs/06_REQUERIMIENTOS_E_HISTORIAS_DE_USUARIO.md)** y **[07. Backend y API](./docs/07_DESARROLLO_BACKEND_Y_API.md)**.
+* 🗺️ **[08. Entregables visuales de Iteración 1](./docs/08_ENTREGABLES_VISUALES.md):** arquitectura, casos de uso, clases y paquetes Mermaid renderizables en GitHub. **[Abrir diagramas visuales](./docs/08_ENTREGABLES_VISUALES.md)**.
 * 📄 **[Documento final editable en HTML](./docs/EVIDENCIA_DE_APRENDIZAJE_1_DOCUMENTO_FINAL.html):** fuente del informe; el PDF generado se conserva localmente, fuera del control de versiones.
 * 🗃️ **Esquema PostgreSQL ejecutable:** [migración Flyway](./src/main/resources/db/migration/V1__schema_inicial.sql). El DDL MySQL histórico de algunos documentos no debe ejecutarse.
 
@@ -75,6 +76,7 @@ Ingenieria - Evidencia de aprendizaje 1/
 │   ├── 05_REVISION_TECNICA_ARQUITECTURA.md # Revisión y trazabilidad
 │   ├── 06_REQUERIMIENTOS_E_HISTORIAS_DE_USUARIO.md
 │   ├── 07_DESARROLLO_BACKEND_Y_API.md
+│   ├── 08_ENTREGABLES_VISUALES.md          # Mermaid de arquitectura y UML
 │   ├── EVIDENCIA_DE_APRENDIZAJE_1_DOCUMENTO_FINAL.html # Fuente editable del informe
 │   ├── staruml/                            # Proyecto UML editable
 │   └── postman/                           # Colección de pruebas de API REST
@@ -102,12 +104,13 @@ Ingenieria - Evidencia de aprendizaje 1/
 │   │       └── application-test.yml       # Perfil de pruebas H2 en memoria
 │   └── test/
 │       ├── java/com/autoscolombia/        # Pruebas unitarias y de integración
-│       └── js/app.test.js                 # Pruebas de humo del frontend
-│       └── integration/                   # Pruebas de integración de controladores
-│       └── service/                       # Pruebas unitarias con Mockito
-├── .github/workflows/                     # Pipeline de CI/CD (GitHub Actions)
-├── docker-compose.yml                     # Orquestación de contenedores (App + PostgreSQL)
-│   └── main/resources/static/              # Interfaz web HTML, CSS y JavaScript
+│       │   ├── integration/                # Pruebas de integración de controladores
+│       │   ├── service/                    # Pruebas de negocio
+│       │   ├── presentation/               # Pruebas de controladores y filtros
+│       │   ├── infrastructure/             # Pruebas del manejador global
+│       │   └── util/                       # Pruebas de JWT
+│       └── js/app.test.js                  # Pruebas de humo del frontend
+├── src/main/resources/static/              # Interfaz web HTML, CSS y JavaScript
 ├── Dockerfile                             # Empaquetado de imagen de producción
 ├── pom.xml                                # Dependencias Maven y configuración JaCoCo
 └── README.md                              # Documentación general del proyecto
@@ -127,8 +130,8 @@ Ingenieria - Evidencia de aprendizaje 1/
 | **Migraciones BD** | Flyway | Integrado con Spring Boot |
 | **Códigos QR** | Google ZXing | 3.5.2 |
 | **Documentación API**| Springdoc OpenAPI (Swagger) | 2.5.0 |
-| **Pruebas Automatizadas**| JUnit 5 + Mockito + JaCoCo y Node.js | 57 pruebas Java; 4 pruebas de interfaz |
-| **Cobertura actual** | JaCoCo | 54,9% líneas; meta 70% pendiente |
+| **Pruebas Automatizadas**| JUnit 5 + Mockito + JaCoCo y Node.js | 136 pruebas Java; 4 pruebas de interfaz |
+| **Cobertura actual** | JaCoCo | 90,2% líneas; meta 70% superada |
 | **Contenedores** | Docker & Docker Compose | Contenedores para API y PostgreSQL |
 
 ---

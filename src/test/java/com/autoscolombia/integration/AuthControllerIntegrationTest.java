@@ -101,6 +101,16 @@ class AuthControllerIntegrationTest {
     }
 
     @Test
+    void testLoginPublicoSinTokenFunciona() throws Exception {
+        LoginRequest request = LoginRequest.builder().correo("test@test.com").clave("clave123").build();
+        mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").isNotEmpty());
+    }
+
+    @Test
     void testAccesoSinToken_401() throws Exception {
         mockMvc.perform(get("/api/v1/registros/activos"))
                 .andExpect(status().isUnauthorized());

@@ -338,7 +338,7 @@ Este informe documenta el trabajo individual de <strong>Brayan Alejandro Durango
     <tr><td><strong>RNF-06</strong></td><td>Disponibilidad</td><td>Persistencia relacional confiable.</td><td>PostgreSQL y volumen Docker persistente.</td></tr>
     <tr><td><strong>RNF-07</strong></td><td>Mantenibilidad</td><td>Arquitectura modular en 4 capas.</td><td>Principios SOLID y Clean Code.</td></tr>
     <tr><td><strong>RNF-08</strong></td><td>Portabilidad</td><td>Despliegue multi-plataforma en contenedores.</td><td>Docker y Docker Compose.</td></tr>
-    <tr><td><strong>RNF-09</strong></td><td>Calidad</td><td>Cobertura de pruebas automatizadas.</td><td>Umbral objetivo ≥ 70%; resultado JaCoCo actual: 54,8% de líneas (pendiente de alcanzar).</td></tr>
+    <tr><td><strong>RNF-09</strong></td><td>Calidad</td><td>Cobertura de pruebas automatizadas.</td><td>Meta mínima ≥ 70%; la última cobertura JaCoCo medida alcanza 90,2% de líneas.</td></tr>
     <tr><td><strong>RNF-10</strong></td><td>Usabilidad</td><td>Agilidad de atención en garita de entrada.</td><td>Operación completable en $< 10$ s.</td></tr>
   </tbody>
 </table>
@@ -466,7 +466,7 @@ El sistema implementa una <strong>Arquitectura en Capas Desacopladas (Layered Ar
 <!-- ENTREGABLE 4 -->
 <h2 class="section-title">5. Entregable 4: Wireframes y frontend web</h2>
 <p>
-Se implementó un frontend web adaptable en <code>src/main/resources/static/</code> y se documentaron wireframes textuales. Estos materiales no son un prototipo creado en Figma. Para completar el requisito académico de Figma hace falta crear el archivo en esa plataforma y añadir su enlace y capturas.
+Se implementó un frontend web adaptable en <code>src/main/resources/static/</code> y se documentaron wireframes. Los diagramas de arquitectura, casos de uso, clases y paquetes se encuentran en <a href="08_ENTREGABLES_VISUALES.md">08_ENTREGABLES_VISUALES.md</a> como Mermaid, renderizable en GitHub. Estos entregables no son un prototipo creado en Figma ni una exportación desde StarUML. El archivo Figma auténtico continúa pendiente.
 </p>
 
 <h3 class="subsection-title">Mockup 1: Pantalla de Autenticación / Login (HU-01)</h3>
@@ -782,7 +782,8 @@ Se ejecutó la suite completa de pruebas unitarias y de integración mediante Ap
 [INFO] Results:
 [INFO] Tests run: 56, Failures: 0, Errors: 0, Skipped: 0
 [INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS - 56 pruebas aprobadas. JaCoCo: líneas cubiertas 54,8% (objetivo de cobertura ≥ 70% aún pendiente).
+[INFO] BUILD SUCCESS - Tests run: 136, Failures: 0, Errors: 0, Skipped: 0.
+[INFO] JaCoCo: líneas 90,2%, instrucciones 56,3%, ramas 16,0%. La meta RNF-09 de 70% de líneas queda superada.
 [INFO] ------------------------------------------------------------------------
 </pre>
 
@@ -792,7 +793,7 @@ Se ejecutó la suite completa de pruebas unitarias y de integración mediante Ap
 <ol style="font-size: 10pt; line-height: 1.8;">
   <li><strong>Solidez Arquitectónica:</strong> La separación estricta en 4 capas (Presentación, Dominio, Infraestructura y Datos) garantiza que la lógica de negocio de parqueadero (Pico y Placa, celdas y QR) permanezca inmune a cambios en frameworks web o motores de bases de datos.</li>
   <li><strong>Resolución de Deuda Técnica:</strong> El desacoplamiento temprano de la configuración criptográfica (<code>PasswordEncoderConfig</code>) y la corrección del ciclo de vida JPA con Lombok (<code>@Builder.Default</code> y <code>@PrePersist</code>) evitaron bloqueos operacionales en garita y fallos de persistencia en tiempo de ejecución.</li>
-  <li><strong>Calidad y trabajo pendiente:</strong> Las 56 pruebas pasan en la verificación ejecutada, pero la cobertura JaCoCo de líneas es 54,8% y no alcanza aún la meta de 70%. Falta construir y enlazar el prototipo Figma, completar y validar las vistas gráficas de StarUML y comprobar cada requisito contra la rúbrica antes de considerar cerrada la iteración.</li>
+  <li><strong>Calidad y trabajo pendiente:</strong> La suite automatizada y las pruebas de frontend pasan; la cobertura JaCoCo de líneas medida es 90,2%, superior al objetivo de 70%. Se incluyen diagramas renderizables Mermaid y un frontend visual. Falta un enlace a un archivo Figma auténtico y una exportación visual creada en StarUML para afirmar que esas dos herramientas específicas se usaron.</li>
 </ol>
 
 <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 25px 0;">

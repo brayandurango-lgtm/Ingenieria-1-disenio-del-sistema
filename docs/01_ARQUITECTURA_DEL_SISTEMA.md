@@ -203,7 +203,7 @@ graph TD
    * Código desacoplado siguiendo principios SOLID y Clean Code.
    * Contenedorización completa con Docker y orquestación con Docker Compose.
    * Control de versiones de esquema de base de datos con Flyway para despliegues reproducibles.
-    * Objetivo de cobertura automatizada superior al 70% mediante JaCoCo; la última medición local verificada fue 54,9% de líneas, por lo que esta meta sigue pendiente.
+    * Objetivo de cobertura automatizada superior al 70% mediante JaCoCo; la medición local actual alcanza 90,2% de líneas.
 
 ---
 

@@ -44,7 +44,7 @@
 | **RNF-06** | **Disponibilidad** | Persistencia relacional ACID y recuperación ante fallos. | PostgreSQL con transacciones seguras y volumen Docker persistente. |
 | **RNF-07** | **Mantenibilidad** | Código fuente modular, desacoplado y arquitectura en capas. | Principios SOLID, separación estricta en 4 capas (Presentación, Dominio, Infraestructura, Datos). |
 | **RNF-08** | **Portabilidad** | Despliegue agnóstico del sistema operativo subyacente. | Contenedorización mediante Docker y Docker Compose (Java 17 OpenJDK + PostgreSQL 16). |
-| **RNF-09** | **Calidad de Código** | Pruebas automatizadas de cobertura y regresión. | Cobertura de pruebas unitarias e integración superior al 70% verificada con JaCoCo. |
+| **RNF-09** | **Calidad de Código** | Pruebas automatizadas de cobertura y regresión. | Cobertura de líneas ≥ 70% medida con JaCoCo; resultado local: 90,2%. |
 | **RNF-10** | **Usabilidad** | Diseño de interfaces ágil y optimizado para garita de parqueo. | Registro de entrada completable en menos de 3 clics y 10 segundos por vehículo. |
 
 ---

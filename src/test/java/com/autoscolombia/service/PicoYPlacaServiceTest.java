@@ -38,6 +38,12 @@ class PicoYPlacaServiceTest {
     }
 
     @Test
+    void testLunes_DigitoPermitido() {
+        LocalDateTime lunes = LocalDateTime.of(2026, Month.JANUARY, 5, 10, 0);
+        assertTrue(picoYPlacaService.puedeTransitar("ABC125", lunes));
+    }
+
+    @Test
     void testMartes_Restringido_Digito0() {
         LocalDateTime martes = LocalDateTime.of(2026, Month.JANUARY, 6, 10, 0); // Martes
         assertFalse(picoYPlacaService.puedeTransitar("ABC120", martes));
@@ -111,5 +117,17 @@ class PicoYPlacaServiceTest {
         LocalDateTime lunes = LocalDateTime.of(2026, Month.JANUARY, 5, 10, 0);
         String mensaje = picoYPlacaService.obtenerMensajeRestriccion("ABC123", lunes);
         assertNull(mensaje);
+    }
+
+    @Test
+    void testPlacaMotoConLetraFinalNoRestringePorDigitoNoNumerico() {
+        LocalDateTime lunes = LocalDateTime.of(2026, Month.JANUARY, 5, 10, 0);
+        assertTrue(picoYPlacaService.puedeTransitar("AB123C", lunes));
+    }
+
+    @Test
+    void testDiaHabilAntesDeHorarioRestriccionActualmenteAplicaReglaDelDia() {
+        LocalDateTime temprano = LocalDateTime.of(2026, Month.JANUARY, 5, 5, 30);
+        assertFalse(picoYPlacaService.puedeTransitar("ABC126", temprano));
     }
 }

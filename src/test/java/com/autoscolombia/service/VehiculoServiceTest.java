@@ -130,4 +130,81 @@ class VehiculoServiceTest {
         assertFalse(resultado.isEmpty());
         assertEquals(TipoVehiculo.CARRO, resultado.get(0).getTipo());
     }
+
+    @Test
+    void testCrearOActualizar_CopiaDatosPropietarioAlCrear() {
+        when(vehiculoRepository.findByPlaca("ABC123")).thenReturn(Optional.empty());
+        when(vehiculoRepository.save(any(Vehiculo.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Vehiculo resultado = vehiculoService.crearOActualizar(vehiculoDTO);
+
+        assertEquals("Juan Pérez", resultado.getPropietarioNombre());
+        assertEquals("12345678", resultado.getPropietarioDocumento());
+        assertEquals("3001234567", resultado.getPropietarioTelefono());
+        assertEquals(TipoVehiculo.CARRO, resultado.getTipo());
+    }
+
+    @Test
+    void testCrearOActualizar_ActualizaDatosPropietarioExistente() {
+        Vehiculo existente = Vehiculo.builder().id(2L).placa("ABC123").marca("Anterior")
+                .modelo("Anterior").color("Negro").tipo(TipoVehiculo.MOTO).build();
+        when(vehiculoRepository.findByPlaca("ABC123")).thenReturn(Optional.of(existente));
+        when(vehiculoRepository.save(any(Vehiculo.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Vehiculo resultado = vehiculoService.crearOActualizar(vehiculoDTO);
+
+        assertEquals(2L, resultado.getId());
+        assertEquals("Toyota", resultado.getMarca());
+        assertEquals("Corolla", resultado.getModelo());
+        assertEquals("Rojo", resultado.getColor());
+        assertEquals(TipoVehiculo.CARRO, resultado.getTipo());
+        assertEquals("Juan Pérez", resultado.getPropietarioNombre());
+    }
+
+    @Test
+    void testBuscar_CriterioNuloConTipoYPropietarioEnRespuesta() {
+        when(vehiculoRepository.findAll()).thenReturn(Arrays.asList(vehiculo));
+
+        List<VehiculoDTO> resultado = vehiculoService.buscar(null, TipoVehiculo.CARRO, null);
+
+        assertEquals(1, resultado.size());
+        assertEquals("Juan Pérez", resultado.get(0).getPropietarioNombre());
+        assertEquals("12345678", resultado.get(0).getPropietarioDocumento());
+        assertEquals("3001234567", resultado.get(0).getPropietarioTelefono());
+    }
+
+    @Test
+    void testBuscar_ConCriterioYTipoFiltraCoincidencias() {
+        Vehiculo moto = Vehiculo.builder().id(2L).placa("ABC124").marca("Honda")
+                .modelo("CB").color("Azul").tipo(TipoVehiculo.MOTO).build();
+        when(vehiculoRepository.findByPlacaContainingIgnoreCaseOrPropietarioNombreContainingIgnoreCaseOrPropietarioDocumentoContaining(
+                "ABC", "ABC", "ABC")).thenReturn(Arrays.asList(vehiculo, moto));
+
+        List<VehiculoDTO> resultado = vehiculoService.buscar("ABC", TipoVehiculo.CARRO, null);
+
+        assertEquals(1, resultado.size());
+        assertEquals("ABC123", resultado.get(0).getPlaca());
+        verify(vehiculoRepository, never()).findAll();
+    }
+
+    @Test
+    void testBuscar_CriterioEnBlancoUsaListadoCompleto() {
+        when(vehiculoRepository.findAll()).thenReturn(Arrays.asList(vehiculo));
+
+        List<VehiculoDTO> resultado = vehiculoService.buscar("   ", null, null);
+
+        assertEquals(1, resultado.size());
+        verify(vehiculoRepository).findAll();
+        verify(vehiculoRepository, never()).findByPlacaContainingIgnoreCaseOrPropietarioNombreContainingIgnoreCaseOrPropietarioDocumentoContaining(
+                anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void testBuscarPorPlaca_UsaPlacaSolicitada() {
+        when(vehiculoRepository.findByPlaca("XYZ999")).thenReturn(Optional.empty());
+
+        assertTrue(vehiculoService.buscarPorPlaca("XYZ999").isEmpty());
+
+        verify(vehiculoRepository).findByPlaca("XYZ999");
+    }
 }

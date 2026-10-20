@@ -23,8 +23,8 @@ El objetivo de esta revisión fue:
 5. Construir la **Matriz de Trazabilidad Técnica** que conecta los requerimientos funcionales con cada artefacto de software.
 
 **Resultado Global de la Auditoría:** **VERIFICADO LOCALMENTE CON PENDIENTES; NO CERTIFICADO PARA DESPLIEGUE**.
-* Pruebas Java ejecutadas: **57 pruebas (0 fallos, 0 errores, 0 omitidas)**; pruebas de humo frontend ejecutadas por separado: **4 aprobadas**.
-* Cobertura de código JaCoCo: la última medición repetible debe generarse con `mvn clean verify`; la medición verificada en esta revisión fue **54,8% de líneas**, inferior al objetivo RNF-09 del 70%.
+* Pruebas Java ejecutadas: **136 (0 fallos, 0 errores, 0 omitidas)**; pruebas de humo frontend ejecutadas por separado: **4 aprobadas**.
+* Cobertura JaCoCo: **90,2% de líneas**, **56,3% de instrucciones** y **16,0% de ramas**. Se cumple RNF-09 de 70% en líneas; elevar instrucciones y ramas queda como mejora.
 * Estado de dependencias cíclicas: no se reportaron ciclos de beans durante el arranque de pruebas.
 
 ---
@@ -79,7 +79,7 @@ Durante la revisión técnica se detectaron tres (3) aspectos de diseño que req
   5. `celdaRepository.deleteAll()`
   6. `vehiculoRepository.deleteAll()`
   7. `usuarioRepository.deleteAll()`
-  La ejecución local verificada reporta 57 pruebas Java aprobadas (0 fallos, 0 errores y 0 omitidas); además pasan 4 pruebas Node del frontend. El resultado debe repetirse en CI para confirmar reproducibilidad.
+  La última ejecución local reporta 136 pruebas Java aprobadas; además pasan 4 pruebas Node del frontend. El resultado debe repetirse en CI para confirmar reproducibilidad.
 
 ---
 
