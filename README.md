@@ -246,7 +246,9 @@ node --test src/test/js/app.test.js
 
 Para probar la experiencia completa con la API, inicia Spring Boot, abre `http://localhost:8080` y autentícate con un usuario sembrado por Flyway. Comprueba inicio de sesión válido e inválido, registro de entrada, placa duplicada, búsqueda y salida, dashboard, novedad y cierre de sesión.
 
----
+### Diagramas visuales
+
+[Entregables visuales de Iteración 1](https://github.com/brayandurango-lgtm/Ingenieria-1-disenio-del-sistema/blob/main/docs/08_ENTREGABLES_VISUALES.md)
 
 ## 📄 Licencia y Derechos
 
